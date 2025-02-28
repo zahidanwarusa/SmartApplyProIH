@@ -23,7 +23,7 @@ SmartApplyPro is an intelligent job application automation system that leverages
 
 1. Clone this repository:
    ```
-   git clone https://github.com/yourusername/job-application-automation.git
+   git clone https://github.com/zahidanwarusa/SmartApplyPro.git
    cd job-application-automation
    ```
 
