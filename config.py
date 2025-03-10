@@ -17,9 +17,17 @@ DEFAULT_RESUME = BASE_DIR / 'default-resume-main.json'
 if not DEFAULT_RESUME.exists():
     raise FileNotFoundError(f"Default resume template not found: {DEFAULT_RESUME}")
 
-# API Keys
-#GEMINI_API_KEY = 'AIzaSyA3-UQ3YWkv4xuG7yC3y0eyBwRR8edCX2I'  # Replace with your key
-GEMINI_API_KEY = 'AIzaSyB3g63kzoe9oKt6JxH8luvit3xS_GGIpBE'  # Replace with your key
+# API Keys - Support for multiple keys with rotation
+# The system will use these keys in order and rotate when limits are reached
+GEMINI_API_KEYS = [
+    'AIzaSyB3g63kzoe9oKt6JxH8luvit3xS_GGIpBE',  # Primary key
+    'AIzaSyA3-UQ3YWkv4xuG7yC3y0eyBwRR8edCX2I',  # Secondary key
+    # Add more keys as needed
+]
+
+# API limits and settings
+API_DAILY_LIMIT = 1500  # Maximum requests per day per key
+API_WARNING_THRESHOLD = 0.85  # Warn when usage reaches 85% of limit
 
 # Chrome Settings
 CHROME_PROFILE = {
@@ -43,13 +51,15 @@ DELAYS = {
     'page_load': (4, 8),
     'between_actions': (2, 5),
     'between_applications': (8, 15),
-    'between_pages': (5, 10)
+    'between_pages': (5, 10),
+    'status_check': (5, 10)  # New delay for status checks (Easy Apply, Already Applied)
 }
 
 MAX_RETRIES = {
     'click': 3,
     'form': 2,
-    'page_load': 2
+    'page_load': 2,
+    'status_check': 3  # New retry setting for status checks
 }
 
 # Job Search Settings
@@ -126,7 +136,7 @@ JOB_TITLES = [
 DICE_SEARCH_URL = "https://www.dice.com/jobs?q={}&countryCode=US&radius=30&radiusUnit=mi&pageSize=20&filters.workplaceTypes=Remote&filters.easyApply=true&language=en"
 
 # Application Limits
-MAX_APPLICATIONS_PER_DAY = 300
+MAX_APPLICATIONS_PER_DAY = 2
 MAX_PAGES_PER_TITLE = 3  # How many pages to process before moving to next title
 
 # Debug Mode - Set to True for additional debugging information

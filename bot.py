@@ -221,56 +221,75 @@ class DiceBot:
             return None
 
     def check_easy_apply_available(self, card) -> bool:
-        """Streamlined check if Easy Apply is available"""
-        try:
-            # Method 1: Check for apply-button-wc web component (shadow DOM)
-            apply_buttons = card.find_elements(By.TAG_NAME, "apply-button-wc")
-            if apply_buttons:
-                for apply_button in apply_buttons:
-                    # Check if it has an apply button in shadow DOM
-                    has_apply = self.driver.execute_script("""
-                        const applyButton = arguments[0];
-                        if (!applyButton.shadowRoot) return false;
-                        const button = applyButton.shadowRoot.querySelector('button');
-                        return button && !button.disabled;
-                    """, apply_button)
-                    
-                    if has_apply:
-                        self.logger.info("Found Easy Apply in shadow DOM")
-                        return True
-            
-            # Method 2: Look for standard Easy Apply indicators
-            easy_apply_indicators = [
-                "[data-cy='easyApplyBtn']",
-                ".easy-apply-button",
-                ".easy-apply",
-                "button[class*='easyApply']",
-                "button[class*='easy-apply']"
-            ]
-            
-            for indicator in easy_apply_indicators:
-                elements = card.find_elements(By.CSS_SELECTOR, indicator)
-                for element in elements:
+        """Improved check if Easy Apply is available with proper delay and retries"""
+        max_retries = MAX_RETRIES.get('status_check', 3)
+        
+        for attempt in range(max_retries):
+            try:
+                self.logger.info(f"Checking for Easy Apply (attempt {attempt+1}/{max_retries})")
+                
+                # First delay to allow the page to fully update
+                self.random_delay('status_check')
+                
+                # Method 1: Check for apply-button-wc web component (shadow DOM)
+                apply_buttons = card.find_elements(By.TAG_NAME, "apply-button-wc")
+                if apply_buttons:
+                    for apply_button in apply_buttons:
+                        # Check if it has an apply button in shadow DOM
+                        has_apply = self.driver.execute_script("""
+                            const applyButton = arguments[0];
+                            if (!applyButton.shadowRoot) return false;
+                            const button = applyButton.shadowRoot.querySelector('button');
+                            return button && !button.disabled;
+                        """, apply_button)
+                        
+                        if has_apply:
+                            self.logger.info("Found Easy Apply in shadow DOM")
+                            return True
+                
+                # Method 2: Look for standard Easy Apply indicators
+                easy_apply_indicators = [
+                    "[data-cy='easyApplyBtn']",
+                    ".easy-apply-button",
+                    ".easy-apply",
+                    "button[class*='easyApply']",
+                    "button[class*='easy-apply']"
+                ]
+                
+                for indicator in easy_apply_indicators:
+                    elements = card.find_elements(By.CSS_SELECTOR, indicator)
+                    for element in elements:
+                        if element.is_displayed():
+                            self.logger.info(f"Found Easy Apply indicator: {indicator}")
+                            return True
+                
+                # Method 3: Look for "Easy Apply" text
+                easy_apply_elements = card.find_elements(
+                    By.XPATH, 
+                    ".//*[contains(translate(text(), 'EASY APPLY', 'easy apply'), 'easy apply')]"
+                )
+                for element in easy_apply_elements:
                     if element.is_displayed():
+                        self.logger.info("Found Easy Apply text")
                         return True
-            
-            # Method 3: Look for "Easy Apply" text
-            easy_apply_elements = card.find_elements(
-                By.XPATH, 
-                ".//*[contains(translate(text(), 'EASY APPLY', 'easy apply'), 'easy apply')]"
-            )
-            for element in easy_apply_elements:
-                if element.is_displayed():
-                    return True
-            
-            return False
-            
-        except Exception as e:
-            self.logger.warning(f"Error checking Easy Apply availability: {str(e)}")
-            return False
+                
+                # If this is not the last attempt, wait longer before retry
+                if attempt < max_retries - 1:
+                    self.logger.info(f"Easy Apply not found, waiting before retry {attempt+1}")
+                    time.sleep(2 * (attempt + 1))  # Progressive delay
+                
+            except Exception as e:
+                self.logger.warning(f"Error checking Easy Apply availability (attempt {attempt+1}): {str(e)}")
+                if attempt < max_retries - 1:
+                    time.sleep(2)  # Wait before retry
+        
+        self.logger.info("Easy Apply not available after all attempts")
+        return False
     
     def is_already_applied(self, card) -> bool:
-        """Improved check if already applied to job"""
+        """Improved check if already applied to job with proper delay and retries"""
+        max_retries = MAX_RETRIES.get('status_check', 3)
+        
         try:
             # Get job ID first
             job_id = self.get_job_id_from_card(card)
@@ -284,53 +303,73 @@ class DiceBot:
             if job_id in self.processed_job_ids:
                 self.logger.info(f"Already processed job ID {job_id} in this session")
                 return True
-                
-            # Method 1: Check for visible "Applied" indicators
-            applied_indicators = [
-                ".ribbon-status-applied",
-                ".search-status-ribbon-mobile.ribbon-status-applied",
-                ".status-applied",
-                ".already-applied"
-            ]
-            
-            for indicator in applied_indicators:
-                if card.find_elements(By.CSS_SELECTOR, indicator):
-                    return True
-            
-            # Method 2: Check shadow DOM for "Application Submitted" text
-            apply_buttons = card.find_elements(By.TAG_NAME, "apply-button-wc")
-            if apply_buttons:
-                for apply_button in apply_buttons:
-                    is_applied = self.driver.execute_script("""
-                        const applyButton = arguments[0];
-                        if (!applyButton.shadowRoot) return false;
-                        
-                        // Check for application-submitted component
-                        const appSubmitted = applyButton.shadowRoot.querySelector('application-submitted');
-                        if (appSubmitted) return true;
-                        
-                        // Check text content
-                        const shadowText = applyButton.shadowRoot.textContent.toLowerCase();
-                        return shadowText.includes('application submitted') || 
-                               shadowText.includes('applied') ||
-                               shadowText.includes('app submitted');
-                    """, apply_button)
-                    
-                    if is_applied:
-                        return True
-            
-            # Method 3: Check card text
-            card_text = card.text.lower()
-            applied_texts = ['application submitted', 'applied', 'app submitted']
-            for text in applied_texts:
-                if text in card_text:
-                    return True
-                    
-            return False
-            
         except Exception as e:
-            self.logger.warning(f"Error checking applied status: {str(e)}")
-            return False
+            self.logger.warning(f"Error checking job ID: {str(e)}")
+        
+        # Proceed with UI checks with retries
+        for attempt in range(max_retries):
+            try:
+                self.logger.info(f"Checking if already applied (attempt {attempt+1}/{max_retries})")
+                
+                # Add delay to allow the page to update its status
+                self.random_delay('status_check')
+                
+                # Method 1: Check for visible "Applied" indicators
+                applied_indicators = [
+                    ".ribbon-status-applied",
+                    ".search-status-ribbon-mobile.ribbon-status-applied",
+                    ".status-applied",
+                    ".already-applied"
+                ]
+                
+                for indicator in applied_indicators:
+                    if card.find_elements(By.CSS_SELECTOR, indicator):
+                        self.logger.info(f"Found applied indicator: {indicator}")
+                        return True
+                
+                # Method 2: Check shadow DOM for "Application Submitted" text
+                apply_buttons = card.find_elements(By.TAG_NAME, "apply-button-wc")
+                if apply_buttons:
+                    for apply_button in apply_buttons:
+                        is_applied = self.driver.execute_script("""
+                            const applyButton = arguments[0];
+                            if (!applyButton.shadowRoot) return false;
+                            
+                            // Check for application-submitted component
+                            const appSubmitted = applyButton.shadowRoot.querySelector('application-submitted');
+                            if (appSubmitted) return true;
+                            
+                            // Check text content
+                            const shadowText = applyButton.shadowRoot.textContent.toLowerCase();
+                            return shadowText.includes('application submitted') || 
+                                shadowText.includes('applied') ||
+                                shadowText.includes('app submitted');
+                        """, apply_button)
+                        
+                        if is_applied:
+                            self.logger.info("Found applied status in shadow DOM")
+                            return True
+                
+                # Method 3: Check card text
+                card_text = card.text.lower()
+                applied_texts = ['application submitted', 'applied', 'app submitted']
+                for text in applied_texts:
+                    if text in card_text:
+                        self.logger.info(f"Found applied text: '{text}'")
+                        return True
+                
+                # If this is not the last attempt, wait longer before retry
+                if attempt < max_retries - 1:
+                    self.logger.info(f"Applied status not found, waiting before retry {attempt+1}")
+                    time.sleep(2 * (attempt + 1))  # Progressive delay
+                    
+            except Exception as e:
+                self.logger.warning(f"Error checking applied status (attempt {attempt+1}): {str(e)}")
+                if attempt < max_retries - 1:
+                    time.sleep(2)  # Wait before retry
+        
+        self.logger.info("No applied status found after all attempts")
+        return False
     
     def extract_job_details(self, card) -> Optional[Tuple[Dict, str]]:
         """Extract job details from card and detailed view"""
@@ -415,6 +454,8 @@ class DiceBot:
             except:
                 self.logger.error("Timeout waiting for new window")
                 return None
+            
+            time.sleep(5)
             
             # Wait for job details page to load
             WebDriverWait(self.driver, 15).until(
@@ -945,7 +986,7 @@ class DiceBot:
             return False
 
     def process_search_results(self) -> int:
-        """Process all jobs on current page, returns number of new jobs found"""
+        """Process all jobs on current page with improved status checking, returns number of new jobs found"""
         new_jobs_found = 0
         try:
             # Find all job cards
@@ -977,13 +1018,19 @@ class DiceBot:
                 self.tracker.increment_jobs_found()
                 new_jobs_found += 1
                 
-                # First check if already applied
+                # Scroll to the card to ensure it's in view
+                self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", card)
+                
+                # Allow the page some time to update statuses after scrolling
+                time.sleep(3)
+                
+                # First check if already applied - using the improved function with retries and delays
                 if self.is_already_applied(card):
                     self.logger.info("Skipping already applied job")
                     self.jobs_skipped += 1
                     continue
                 
-                # Then check if Easy Apply is available
+                # Then check if Easy Apply is available - using the improved function with retries and delays
                 if not self.check_easy_apply_available(card):
                     self.logger.info("Skipping job without Easy Apply")
                     
@@ -1048,7 +1095,7 @@ class DiceBot:
                 self.driver.close()
                 self.driver.switch_to.window(self.driver.window_handles[0])
             return new_jobs_found
-
+        
     def next_page_exists(self) -> bool:
         """Check if next page exists"""
         try:
@@ -1148,10 +1195,13 @@ class DiceBot:
         return report_path
 
     def run(self):
-        """Main execution flow with improved job title handling"""
+        """Main execution flow with improved job title handling and API key monitoring"""
         try:
             if not self.setup_driver():
                 return
+                
+            # Initialize the Gemini service for API key monitoring
+            gemini_service = GeminiService()
                 
             # Load tracking data if it exists
             tracking_file = DATA_DIR / 'tracking' / 'title_tracking.json'
@@ -1169,7 +1219,45 @@ class DiceBot:
             
             # Process all titles with cycling instead of exhausting one at a time
             max_pages_per_title = 3  # Limit pages per title before cycling
+            
+            # Track API check frequency
+            last_api_check_time = time.time()
+            api_check_interval = 900  # Check API status every 15 minutes (900 seconds)
+            
             while available_titles:
+                # Periodically check API key status
+                current_time = time.time()
+                if current_time - last_api_check_time > api_check_interval:
+                    self.logger.info("Checking API key status...")
+                    
+                    # Check if all API keys are exhausted
+                    if gemini_service.are_all_keys_exhausted():
+                        self.logger.error("All API keys have reached their daily limit. Stopping operation.")
+                        print("\n⚠️ OPERATION HALTED: All API keys have reached their daily limit!")
+                        print("Please try again tomorrow or add new API keys to config.py.")
+                        
+                        # Generate final report before stopping
+                        report_path = self.generate_summary_report()
+                        self.logger.info(f"Final report saved to: {report_path}")
+                        return
+                    
+                    # Update last check time
+                    last_api_check_time = current_time
+                    
+                    # Display current API usage
+                    api_stats = gemini_service.get_api_usage_stats()
+                    self.logger.info(f"API usage: {api_stats['total_usage']} calls today")
+                    
+                    current_key = None
+                    for key_id, stats in api_stats['keys'].items():
+                        if stats['is_current']:
+                            current_key = key_id
+                            current_usage = stats['usage']
+                            current_limit = stats['limit']
+                            current_percentage = stats['percentage']
+                            
+                    self.logger.info(f"Current key {current_key}: {current_usage}/{current_limit} ({current_percentage:.1f}%)")
+                
                 # Get next title to process
                 current_title = available_titles.pop(0)
                 self.logger.info(f"Processing job title: {current_title}")
@@ -1199,6 +1287,17 @@ class DiceBot:
                             json.dump(self.processed_titles, f)
                     except Exception as e:
                         self.logger.warning(f"Error saving tracking data: {str(e)}")
+                    
+                    # Check if all API keys are exhausted after processing each page
+                    if gemini_service.are_all_keys_exhausted():
+                        self.logger.error("All API keys have reached their daily limit during page processing. Stopping operation.")
+                        print("\n⚠️ OPERATION HALTED: All API keys have reached their daily limit!")
+                        print("Please try again tomorrow or add new API keys to config.py.")
+                        
+                        # Generate final report before stopping
+                        report_path = self.generate_summary_report()
+                        self.logger.info(f"Final report saved to: {report_path}")
+                        return
                     
                     # Check if we should move to next page
                     if not self.next_page_exists():

@@ -32,13 +32,93 @@ def setup_logging():
     logging.getLogger('selenium').setLevel(logging.WARNING)
 
 def run_auto_apply():
-    """Run automated job application bot"""
+    """Run automated job application bot with API key monitoring"""
     print("\nStarting SmartApplyPro automated job applications...")
     print("Press Ctrl+C at any time to stop the process.\n")
+    
+    # Initialize Gemini service to check API keys
+    gemini = GeminiService()
+    
+    # Check if any API keys are available
+    if gemini.are_all_keys_exhausted():
+        print("\n⚠️ ERROR: All API keys have reached their daily limit!")
+        print("Please try again tomorrow or add new API keys to config.py.")
+        return
+        
+    # Show current API usage
+    api_stats = gemini.get_api_usage_stats()
+    print("\nCurrent API Key Usage:")
+    print(f"Date: {api_stats['date']}")
+    print(f"Total API calls today: {api_stats['total_usage']}")
+    
+    for key_id, stats in api_stats['keys'].items():
+        status = "CURRENT" if stats['is_current'] else "STANDBY"
+        usage_bar = generate_progress_bar(stats['percentage'])
+        print(f"{key_id}: {stats['usage']}/{stats['limit']} ({stats['percentage']:.1f}%) {usage_bar} [{status}]")
+    
+    print("\n")
     
     # Create bot and run
     bot = DiceBot()
     bot.run()
+    
+def generate_progress_bar(percentage, width=20):
+    """Generate a text-based progress bar"""
+    filled_width = int(width * percentage / 100)
+    empty_width = width - filled_width
+    
+    if percentage < 50:
+        color = "GREEN"
+    elif percentage < 85:
+        color = "YELLOW"
+    else:
+        color = "RED"
+        
+    bar = "█" * filled_width + "░" * empty_width
+    return bar
+
+def monitor_api_usage():
+    """Display current API key usage statistics"""
+    try:
+        gemini = GeminiService()
+        api_stats = gemini.get_api_usage_stats()
+        
+        print("\n=======================================")
+        print("Gemini API Key Usage Statistics")
+        print("=======================================")
+        print(f"Date: {api_stats['date']}")
+        print(f"Total API calls today: {api_stats['total_usage']}")
+        print("")
+        
+        print("API Key Usage:")
+        print("-" * 60)
+        print(f"{'API Key':<20} {'Usage':<10} {'Limit':<10} {'Status':<15}")
+        print("-" * 60)
+        
+        for key_id, stats in api_stats['keys'].items():
+            status = "ACTIVE" if stats['is_current'] else "STANDBY"
+            if stats['usage'] >= stats['limit']:
+                status = "EXHAUSTED"
+                
+            print(f"{key_id:<20} {stats['usage']:<10} {stats['limit']:<10} {status:<15}")
+            
+            # Progress bar
+            percentage = stats['percentage']
+            bar_width = 40
+            filled_width = int(bar_width * percentage / 100)
+            empty_width = bar_width - filled_width
+            
+            bar = "█" * filled_width + "░" * empty_width
+            print(f"[{bar}] {percentage:.1f}%")
+            print("")
+        
+        # Check if all keys are exhausted
+        if gemini.are_all_keys_exhausted():
+            print("\n⚠️ WARNING: All API keys have reached their daily limit!")
+            print("Please try again tomorrow or add new API keys to config.py.")
+        
+    except Exception as e:
+        print(f"\nError monitoring API usage: {str(e)}")
 
 def generate_resume(job_description_file: str) -> Optional[str]:
     """Generate optimized resume from job description file"""

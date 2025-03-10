@@ -5,23 +5,105 @@ import re
 import time
 from pathlib import Path
 import google.generativeai as genai
-from config import GEMINI_API_KEY
+from config import GEMINI_API_KEYS, DATA_DIR, API_DAILY_LIMIT, API_WARNING_THRESHOLD
+from api_key_manager import APIKeyManager
 
 class GeminiService:
-    """Handles all interactions with Gemini AI with robust response handling"""
+    """Handles all interactions with Gemini AI with robust response handling and API key rotation"""
     
     def __init__(self):
-        self.setup_gemini()
+        # Initialize logger first
         self.logger = logging.getLogger(__name__)
         
         # Create debug directory for response analysis
         self.debug_dir = Path('debug')
         self.debug_dir.mkdir(exist_ok=True)
         
+        # Initialize the API key manager
+        self.api_key_manager = APIKeyManager(
+            GEMINI_API_KEYS, 
+            DATA_DIR, 
+            daily_limit=API_DAILY_LIMIT, 
+            warning_threshold=API_WARNING_THRESHOLD
+        )
+        
+        # Setup Gemini (now the logger is available)
+        self.setup_gemini()
+        
     def setup_gemini(self):
-        """Initialize Gemini AI"""
-        genai.configure(api_key=GEMINI_API_KEY)
+        """Initialize Gemini AI with current API key"""
+        current_key = self.api_key_manager.get_current_key()
+        genai.configure(api_key=current_key)
         self.model = genai.GenerativeModel("gemini-1.5-flash")
+        self.logger.info("Configured Gemini with current API key")
+
+    def _handle_api_error(self, error):
+        """Handle API errors, particularly rate limit errors"""
+        error_str = str(error)
+        
+        # Check if this is a rate limit or quota exceeded error
+        rate_limit_patterns = [
+            "rate limit",
+            "quota exceeded",
+            "resource exhausted",
+            "limit exceeded",
+            "too many requests"
+        ]
+        
+        is_rate_limit = any(pattern in error_str.lower() for pattern in rate_limit_patterns)
+        
+        if is_rate_limit:
+            self.logger.warning(f"API rate limit reached: {error_str}")
+            
+            # Try to rotate to next key
+            if self.api_key_manager.increment_usage():
+                self.setup_gemini()  # Reconfigure with new key
+                return True  # Key rotation successful
+            else:
+                self.logger.error("All API keys have reached their daily limit")
+                return False  # All keys exhausted
+        
+        # Some other API error
+        self.logger.error(f"API error (not rate-limit related): {error_str}")
+        return None  # Not a rate limit error
+
+    def make_api_call(self, prompt, max_retries=2, **kwargs):
+        """Make an API call with retry logic for rate limits"""
+        retry_count = 0
+        
+        while retry_count <= max_retries:
+            try:
+                # Increment usage counter before making the call
+                if not self.api_key_manager.increment_usage():
+                    self.logger.error("All API keys have reached their daily limit")
+                    return None
+                
+                response = self.model.generate_content(prompt, **kwargs)
+                return response
+                
+            except Exception as e:
+                result = self._handle_api_error(e)
+                
+                if result is True:
+                    # Rate limit error, but successfully rotated to new key
+                    retry_count += 1
+                    self.logger.info(f"Retrying with new API key (attempt {retry_count}/{max_retries})")
+                    time.sleep(1)  # Brief pause before retry
+                    continue
+                    
+                elif result is False:
+                    # All keys exhausted
+                    self.logger.error("All API keys exhausted, cannot proceed")
+                    return None
+                    
+                else:
+                    # Not a rate limit error - don't retry
+                    self.logger.error(f"API call failed: {str(e)}")
+                    return None
+                    
+        # Max retries reached
+        self.logger.error(f"Max retries ({max_retries}) reached for API call")
+        return None
 
     def optimize_resume_section(self, section_name: str, current_content, job_details: dict):
         """Main method to optimize a resume section based on job details"""
@@ -44,8 +126,8 @@ class GeminiService:
             with open(self.debug_dir / f"{section_name}_prompt.txt", 'w') as f:
                 f.write(prompt)
                 
-            # Get response from Gemini
-            response = self.model.generate_content(
+            # Get response from Gemini with API key rotation
+            response = self.make_api_call(
                 prompt,
                 generation_config=genai.GenerationConfig(
                     temperature=0.1,
@@ -666,8 +748,8 @@ class GeminiService:
                 with open(self.debug_dir / f"job_{i+1}_prompt.txt", 'w') as f:
                     f.write(prompt)
                 
-                # Get response from Gemini
-                response = self.model.generate_content(
+                # Get response from Gemini with API key rotation
+                response = self.make_api_call(
                     prompt,
                     generation_config=genai.GenerationConfig(
                         temperature=0.1,
@@ -995,7 +1077,7 @@ class GeminiService:
         return text
 
     def generate_cover_letter(self, job_details: dict, resume_path: str) -> str:
-        """Generate cover letter from job details and resume"""
+        """Generate cover letter from job details and resume with API key rotation"""
         try:
             # Load resume data from the JSON file
             try:
@@ -1052,7 +1134,8 @@ class GeminiService:
             with open(self.debug_dir / "cover_letter_prompt.txt", 'w') as f:
                 f.write(prompt)
 
-            response = self.model.generate_content(
+            # Use the API key rotation mechanism
+            response = self.make_api_call(
                 prompt,
                 generation_config=genai.GenerationConfig(
                     temperature=0.7,  # Higher temperature for more natural writing
@@ -1090,3 +1173,26 @@ class GeminiService:
         except Exception as e:
             self.logger.error(f"Error generating cover letter: {str(e)}")
             return ""
+            
+    def get_api_usage_stats(self):
+        """Get current API usage statistics"""
+        return self.api_key_manager.get_usage_stats()
+        
+    def are_all_keys_exhausted(self):
+        """Check if all API keys have reached their daily limit"""
+        return self.api_key_manager.all_keys_exhausted()
+        
+    def test_connection(self):
+        """Test the Gemini API connection"""
+        try:
+            response = self.make_api_call(
+                "Hello, this is a connection test",
+                generation_config=genai.GenerationConfig(
+                    temperature=0.1,
+                    max_output_tokens=10,
+                )
+            )
+            return response is not None
+        except Exception as e:
+            self.logger.error(f"Connection test failed: {str(e)}")
+            return False
