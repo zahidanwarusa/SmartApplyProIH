@@ -81,6 +81,15 @@ python main.py --mode list
 python main.py --mode report
 ```
 
+# Basic usage - generate resume
+python main.py --mode process-description --job-description example-job.txt
+
+# Generate both resume and cover letter
+python main.py --mode process-description --job-description example-job.txt --output-type generate_both --job-title "Senior SDET" --company "HealthTech Solutions"
+
+# Just create the JSON file (if you want to inspect it before generating a resume)
+python main.py --mode process-description --job-description example-job.txt --output-type save_json_only
+
 ## 📊 Application Tracking
 
 SmartApplyPro now includes a powerful application tracking system that:

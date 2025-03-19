@@ -13,7 +13,7 @@ for directory in [DATA_DIR, RESUME_DIR, JOBS_DIR, TEMP_DIR]:
     directory.mkdir(parents=True, exist_ok=True)
 
 # Default resume template
-DEFAULT_RESUME = BASE_DIR / 'default-resume-zahid.json'
+DEFAULT_RESUME = BASE_DIR / 'waleed-resume.json'
 if not DEFAULT_RESUME.exists():
     raise FileNotFoundError(f"Default resume template not found: {DEFAULT_RESUME}")
 
@@ -32,7 +32,7 @@ API_WARNING_THRESHOLD = 0.85  # Warn when usage reaches 85% of limit
 # Chrome Settings
 CHROME_PROFILE = {
     'user_data_dir': 'C:\\Users\\ABC\\AppData\\Local\\Google\\Chrome\\User Data',
-    'profile_directory': 'Profile 1'
+    'profile_directory': 'Profile 2'
 }
 
 # ChromeDriver path
@@ -64,72 +64,26 @@ MAX_RETRIES = {
 
 # Job Search Settings
 JOB_TITLES = [
-  "SDET",
-  "Software Development Engineer in Test",
-  "Automation Engineer",
-  "QA Automation Engineer",
-  "Test Automation Engineer",
-  "Senior SDET",
-  "Lead SDET",
-  "Healthcare SDET",
-  "Medical Device SDET",
-  "Clinical Systems SDET",
-  "Healthcare Test Engineer",
-  "Medical Device Test Engineer",
-  "Clinical Systems Test Engineer",
-  "Healthcare Software Test Engineer",
-  "Medical Software Test Engineer",
-  "Healthcare Quality Engineer",
-  "Medical Device Quality Engineer",
-  "SDET (Test Automation)",
-  "Software Test Automation Engineer",
-  "Quality Automation Engineer",
-  "Test Engineer (Automation)",
-  "Senior Test Automation Engineer",
-  "Lead Test Automation Engineer",
-  "SDET II",
-  "SDET III",
-  "Automation Test Lead",
-  "Quality Engineer (Automation)",
-  "Software Test Engineer (Automation)",
-  "Test Automation Developer",
-  "Senior Quality Automation Engineer",
-  "Lead Quality Automation Engineer",
-  "Test Automation Specialist",
-  "Senior Test Automation Specialist",
-  "Automation Architect",
-  "Test Automation Architect",
-  "HL7 Testing Engineer",
-  "FHIR Testing Engineer",
-  "EHR Testing Engineer",
-  "Cloud SDET",
-  "Cloud Test Engineer",
-  "Security SDET",
-  "Security Test Engineer",
-  "Performance Test Engineer",
-  "Mobile Test Automation Engineer",
-  "API Test Automation Engineer",
-  "DevOps Test Engineer",
-  "AI Test Engineer",
-  "Machine Learning Test Engineer",
-  "Data Quality Engineer",
-  "Accessibility Test Engineer",
-  "Embedded Systems Test Engineer",
-  "Digital Health Test Engineer",
-  "Usability Test Engineer",
-  "Integration Test Engineer",
-  "Regression Test Engineer",
-  "System Test Engineer",
-  "Acceptance Test Engineer",
-  "Exploratory Test Engineer",
-  "Test Manager",
-  "Quality Assurance Manager",
-  "Test Lead",
-  "Quality Lead",
-  "Software Tester",
-  "Manual Tester",
-  "Test Analyst",
-  "Quality Analyst"
+    "Senior Business Analyst",
+    "Business Analyst",
+    "Scrum Master",
+    "Agile Business Analyst",
+    "Business Systems Analyst",
+    "Product Owner",
+    "Requirements Analyst",
+    "Process Analyst",
+    "CRM Business Analyst",
+    "Technical Business Analyst",
+    "Data Analyst",
+    "Healthcare Business Analyst",
+    "Healthcare Data Analyst",
+    "Business Intelligence Analyst",
+    "Power BI Analyst",
+    "Federal Business Analyst",
+    "IT Business Analyst",
+    "Product Analyst",
+    "Systems Analyst",
+    "Business Process Analyst"
 ]
 
 # Search URL template

@@ -1,0 +1,11 @@
+Job Title: SAP BRIM Tester
+Duration: 10 Months
+Location: Remote
+
+Job Description:
+1) 5+ year of SAP Testing experience in SAP SOM, SD, FI, and RAR modules.
+2) Proven experience with SAP BRIM (Billing and Revenue Innovation Management) processes, including configuration and integration.
+3) Preferred atleast one full implementation cycle of SAP BRIM testing experience.
+4) Proficient in creating and executing test plans, test cases, and test scripts.
+5) Experience with SAP testing tools and methodologies.
+6) Strong understanding of functional, integration, regression, and performance testing.

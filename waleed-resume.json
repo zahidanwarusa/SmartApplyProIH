@@ -1,0 +1,172 @@
+{
+  "header": {
+    "name": "Waleed Karimullah",
+    "email": "waleedkarimullah@gmail.com",
+    "phone": "(571) 249-8919",
+    "citizenship": "",
+    "linkedin": ""
+  },
+  "education": [
+    {
+      "university": "George Mason University, Fairfax, VA",
+      "degree": "Bachelor of Science",
+      "major": "Health Information Systems Management",
+      "year": "2016"
+    }
+  ],
+  "career_summary": [
+    "With over 9 years of experience as a Senior Business Analyst, Scrum Master, and Data Analyst, I specialize in software infrastructure, architecture, and administration services for migrating and rebuilding CRM applications.",
+    "I currently serve as Senior Business Analyst / Scrum Master at Toffler Associates, leading requirements workshops and documenting comprehensive functional, technical, reporting, and data requirements. I develop and maintain functional models, process flows, and wireframe diagrams to support business and technical processes.",
+    "I excel in managing business analysis, testing, and training requirements gathering, including Business Process Reengineering leadership, workflow analysis, gap analysis, user stories, test case development, and functional design.",
+    "I have successfully collaborated with CRM and business teams to define reporting requirements and deliver customized Power BI solutions aligned with customer relationship strategies. I optimize Power BI reports for CRM analytics, ensuring real-time updates, data accuracy, and user-friendly visualizations to support decision-making.",
+    "I coordinate and support Agile Scrum activities, including sprint planning, daily scrums, task estimation, and retrospectives. I translate business needs into actionable user stories, epics, and detailed specifications that guide micro service development and address backlog items including application defects."
+  ],
+  "professional_summary": {
+    "overview": "Experienced Senior Business Analyst and Scrum Master with extensive expertise in requirements gathering, business process modeling, and Agile methodologies. Skilled in developing comprehensive documentation and facilitating effective communication between technical and business stakeholders.",
+    "highlights": [
+      "Expertise in software infrastructure, architecture, and administration services for migrating or rebuilding CRM applications",
+      "Lead requirements workshops, documenting comprehensive functional, technical, reporting, and data requirements",
+      "Develop and document current and future business process flows and utilize analysis and diagramming tools to represent business and technical processes",
+      "Manage business analysis, testing, and training requirements gathering, including Business Process Reengineering leadership, workflow analysis, gap analysis, user stories, test case development, and functional design",
+      "Collaborate with CRM and business teams to define reporting requirements and deliver customized Power BI solutions that align with customer relationship strategies",
+      "Optimize Power BI reports for CRM analytics, ensuring real-time updates, data accuracy, and user-friendly visualizations to support decision-making",
+      "Coordinate and support Agile Scrum activities, including sprint planning, daily scrums, task estimation, and retrospectives",
+      "Translate business needs into actionable user stories, epics, and detailed specifications that guide micro service development",
+      "Develop comprehensive documentation, including design documents, standard operating procedures, system and maintenance documentation, and training materials",
+      "Facilitate requirements gathering and planning sessions, collaborating with developers and customers to understand functional and technical requirements",
+      "Assist with basic back-end configuration changes and data preparation, working with development teams during the design phase to clarify use cases and requirements",
+      "Effectively manage priorities and workload across multiple projects and developers",
+      "Experience in screening database files to ensure efficiency of online submission portals and providing error reports using SQL",
+      "Skilled in developing and implementing tracking databases to analyze command compliance and clinic processes",
+      "Experience in structuring large data files ranging from approximately 10,000-2 million records",
+      "Proficient in creating dashboards in JIRA and modifying configurations, utilities, and software default settings for local workstations",
+      "Experience in conducting research of legal procedures to ensure procedural compliance of submitted documents",
+      "Skilled in streamlining user necessities and providing software modifications accordingly",
+      "Experience in improving credentialing workflow of client interface data methods to eliminate waste",
+      "Proficient in administering quality review of classified information to manage and organize increasing numbers of documents and data"
+    ]
+  },
+  "technical_skills": {
+    "programming_languages": ["SQL"],
+    "testing_tools": ["Azure DevOps", "JIRA", "Confluence", "ConnectionPoint"],
+    "testing_and_bug_reporting": ["JIRA", "ServiceNow", "Remedy"],
+    "databases": ["MS Access"],
+    "operating_systems": ["Windows"],
+    "domain_experience": ["Healthcare", "Federal Government"],
+    "ms_office_tools": ["Excel", "Visio", "SharePoint", "Vision"],
+    "web_browsers": [],
+    "methodology": ["Agile", "Scrum"],
+    "ci_cd_tools": ["Jenkins", "Azure DevOps"]
+  },
+  "work_experience": [
+    {
+      "company": "Toffler Associates (FPS, Federal Contractor)",
+      "location": "Arlington, VA",
+      "position": "Senior Business Analyst / Scrum Master",
+      "duration": "May 2023 - Present",
+      "summary": "Lead business analysis and Scrum Master activities for software infrastructure, architecture, and administration services for migrating or rebuilding CRM applications. Develop and document business process flows, conduct requirements workshops, and coordinate Agile Scrum activities to ensure successful project delivery.",
+      "achievements": [
+        "Expertise in software infrastructure, architecture, and administration services for migrating or rebuilding CRM applications",
+        "Lead requirements workshops, documenting comprehensive functional, technical, reporting, and data requirements",
+        "Develop and document current and future business process flows",
+        "Analyze system specifications and utilize analysis and diagramming tools to represent business and technical processes",
+        "Create and maintain functional models, process flows, and wireframe diagrams",
+        "Manage business analysis, testing, and training requirements gathering, including Business Process Reengineering (BPR) leadership, workflow analysis, gap analysis, user stories, test case development, and functional design",
+        "Provide ongoing analysis throughout the project lifecycle",
+        "Collaborated with CRM and business teams to define reporting requirements and deliver customized Power BI solutions that aligned with customer relationship strategies",
+        "Optimized Power BI reports for CRM analytics, ensuring real-time updates, data accuracy, and user-friendly visualizations to support decision-making",
+        "Coordinate and support Agile Scrum activities, including sprint planning, daily scrums, task estimation, and retrospectives",
+        "Translate business needs into actionable user stories, epics, and detailed specifications that guide micro service development",
+        "Address backlog items including application defects",
+        "Develop comprehensive documentation, including design documents, standard operating procedures, system and maintenance documentation, and training materials",
+        "Conduct solution demonstrations for customers",
+        "Collaborate with developers and customers to understand functional and technical requirements",
+        "Facilitate requirements gathering and planning sessions",
+        "Assist with basic back-end configuration changes and data preparation",
+        "Work with the development team during the design phase to clarify use cases and requirements",
+        "Effectively manage priorities and workload across multiple projects and developers"
+      ],
+      "environment": "CRM Applications, ConnectionPoint, Power BI, Azure DevOps, Jenkins, Ansible, MS Access, VMware, Atlassian toolset (JIRA and Confluence), SQL, Salesforce, Remedy, ServiceNow, Excel, Visio, SharePoint, Vision, Virtual Training (WebEx, Zoom, Skype, Microsoft Teams)"
+    },
+    {
+      "company": "Metric5 (TSA, Federal Contractor)",
+      "location": "Atlanta, GA",
+      "position": "Scrum Master / Business Analyst",
+      "duration": "January 2021 - April 2023",
+      "summary": "Served as the technical Scrum Master/Business Analyst for IT and Application Development projects related to Cloud, Open Source and/or Mobile application development. Built strong relationships with stakeholders by conducting Agile ceremonies and demonstrated progress reports on system maintenance and issues resolved by the team.",
+      "achievements": [
+        "Served as the technical Scrum Master/Business Analyst for IT and Application Development projects related to Cloud, Open Source and/or Mobile application development",
+        "Work closely with the UI/UX SME, Developers, and testers in interpreting the requirement/user stories for their designs, test planning, and test case development based on the client's needs",
+        "Build strong relationships with the stakeholders by conducting Daily Stand up, Sprint Planning, Sprint Retrospective, and Sprint Review/Demo on the progress made",
+        "Demonstrated progress reports on system maintenance, issues resolved by the team",
+        "Recommended information technology strategies, policies, and procedures by evaluating organization outcomes",
+        "Organized, managed, and drove the completion of project delivery tasks, assuring proper application of project management standards, tools and methodologies and deliverables",
+        "Agile Events / Ceremonies - effectively managed and facilitated Agile ceremonies to support development and product releases",
+        "Scheduling, managing and coordinating release for .NET applications within various portfolios",
+        "Constructing a release calendar for the different projects to have a centralized view of all releases",
+        "Manage and mitigate risks and resolve issues regarding release quality and schedule"
+      ],
+      "environment": "Cloud, Open Source, Mobile applications, .NET applications, Agile methodologies, Scrum ceremonies"
+    },
+    {
+      "company": "Educology Solutions Inc. (ESI)",
+      "location": "Washington, D.C.",
+      "position": "Business Analyst",
+      "duration": "February 2018 - January 2021",
+      "summary": "Business Analyst for the Long-Term Support and Services system (LTSS) on Medicaid and Medicare functionality for the state of Maryland. Planned and prioritized product feature backlog and development for LTSS, defined product vision, roadmap and PI Planning execution plan, and provided backlog management, iteration planning, and elaboration of user stories.",
+      "achievements": [
+        "Business Analyst for the Long-Term Support and Services system (LTSS) on Medicaid and Medicare functionality for the state of Maryland",
+        "Plan and prioritize product feature backlog and development for LTSS",
+        "Define product vision, roadmap and PI Planning execution plan",
+        "Provide backlog management, iteration planning, and elaboration of the user stories",
+        "Work closely with Product Management to create and maintain a product backlog according to business value or ROI",
+        "Lead meeting with end users to understand needs, and design solutions accounting for value on the Joint Patient Assessment and Tracking System (JPATS) 2.0",
+        "Develop test plans and user guides for the system's release",
+        "Assist in developing an initial set of Key Performance Indicators (KPIs) that are quantitative and qualitative benchmarks using client provided metrics",
+        "Participate in meetings with client to review work progress, specific deliverables, performance evaluation and quality improvement activities, and future plans",
+        "Reporting bugs as they are discovered and working closely with developers and testers to ensure a fix deployment",
+        "Provide support for the initial configuration and parameters of equipment for system credibility and resolve problems to the end user's satisfaction",
+        "Perform testing, troubleshooting, and analysis on the development of LTSS software",
+        "Serve as a Subject Matter Expert driving and defining the launch of new features, services, and functionality for the main product lines for LTSS",
+        "Develop and maintain Standard Operating Procedure (SOP) for the project using the State of Work (SOW)",
+        "Conduct trainings ranging from groups of 25 individuals to summits of 5,000 individuals",
+        "Create and maintain reporting templates and class presentations via PowerPoint with animations, diagrams, etc",
+        "Create Provider Portal webinars for LTSS Maryland Department of Health and the training modules for the users by using the SOP",
+        "Assist in the creation of E-learning modules for training including Camtasia and Snagit (screenshots, verbiage, etc.)"
+      ],
+      "environment": "LTSS platform (4 major subsystems: DDA, MDC, Provider Portal, REMS), JPATS, Medicaid, Medicare, Maryland Department of Health"
+    },
+    {
+      "company": "U.S. Department of Justice (PAE Contractor)",
+      "location": "Falls Church, VA",
+      "position": "Data Analyst",
+      "duration": "September 2016 - November 2017",
+      "summary": "Screened database files to ensure efficiency of online submission portal and provided error reports using SQL to improve turnaround time and reporting capabilities. Conducted research of legal procedures to ensure procedural compliance of submitted documents.",
+      "achievements": [
+        "Screened database files to ensure efficiency of online submission portal",
+        "Provided error reports using SQL to improve turnaround time and reporting capabilities",
+        "Conducted research of legal procedures to ensure procedural compliance of submitted documents",
+        "Streamlined user necessities and provide software modifications accordingly",
+        "Improved credentialing workflow of client interface data method to eliminate waste",
+        "Administered quality review of classified information to manage and organize the increasing number of documents and data collected"
+      ],
+      "environment": "SQL, database management, online submission portal, legal procedures"
+    },
+    {
+      "company": "Maxim Healthcare Services",
+      "location": "Falls Church, VA",
+      "position": "Healthcare Data Analyst",
+      "duration": "August 2014 - September 2016",
+      "summary": "Developed and implemented tracking databases to analyze command compliance and clinic processes. Created dashboards in JIRA and structured large data files. Modified configurations, utilities, and software default settings for local workstations.",
+      "achievements": [
+        "Developed and implemented tracking databases to analyze command compliance and clinic processes",
+        "Created dashboards in JIRA",
+        "Partnered with directors to streamline and strengthen the quality and efficiency of programs",
+        "Structured large data files ranging from approximately 10,000-2 million records",
+        "Modified configurations, utilities, and software default settings for the local workstation",
+        "Provided support and resolved problems to the end user's satisfaction"
+      ],
+      "environment": "JIRA, tracking databases, large data files, healthcare services"
+    }
+  ]
+}

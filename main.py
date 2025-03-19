@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 from typing import Optional
 from datetime import datetime
-
+import hashlib
 from bot import DiceBot
 from resume_handler import ResumeHandler
 from gemini_service import GeminiService
@@ -141,6 +141,141 @@ def generate_resume(job_description_file: str) -> Optional[str]:
     except Exception as e:
         print(f"\nError: {str(e)}")
         return None
+
+def process_job_description(job_description_file: str, job_title: str, 
+                           company_name: str, output_type: str) -> None:
+    """Process a job description file and generate requested output"""
+    try:
+        # Set up debug directory
+        debug_dir = Path('debug')
+        debug_dir.mkdir(exist_ok=True)
+        
+        # Verify the file exists
+        if not os.path.exists(job_description_file):
+            print(f"\nError: Job description file not found: {job_description_file}")
+            return
+        
+        # Read job description from file
+        try:
+            with open(job_description_file, 'r', encoding='utf-8') as f:
+                description_text = f.read()
+                
+            # Save the input for debugging
+            with open(debug_dir / "job_description_input.txt", 'w', encoding='utf-8') as f:
+                f.write(description_text)
+        except Exception as e:
+            print(f"\nError reading job description file: {str(e)}")
+            return
+        
+        print(f"\nProcessing job description for {job_title} at {company_name}...")
+        
+        # Initialize Gemini service
+        gemini = GeminiService()
+        
+        # Convert to JSON using Gemini
+        job_json = gemini.convert_job_description_to_json(description_text, job_title, company_name)
+        
+        if not job_json:
+            print("\nError: Failed to convert job description to JSON")
+            return
+        
+        # Create a unique ID for this job
+        content = f"{job_json['title']}{job_json['company']}{job_json['description'][:100]}"
+        job_id = hashlib.md5(content.encode()).hexdigest()
+        job_json['job_id'] = job_id
+        
+        # Save job details
+        job_file = JOBS_DIR / f"{job_id}.json"
+        with open(job_file, 'w', encoding='utf-8') as f:
+            json.dump(job_json, f, indent=2)
+        
+        print(f"\nJob details extracted and saved to: {job_file}")
+        
+        # Generate requested output
+        if output_type == 'save_json_only':
+            print(f"\nJSON file created successfully. You can find it at: {job_file}")
+            return
+        
+        elif output_type == 'generate_resume':
+            # Generate resume
+            handler = ResumeHandler()
+            resume_path = handler.generate_resume(job_json)
+            
+            if resume_path:
+                print(f"\nResume generated successfully: {resume_path}")
+            else:
+                print("\nError generating resume")
+        
+        elif output_type == 'generate_cover_letter':
+            # First generate a resume (required for cover letter)
+            handler = ResumeHandler()
+            resume_path = handler.generate_resume(job_json)
+            
+            if not resume_path:
+                print("\nError: Resume generation failed, which is required for cover letter")
+                return
+            
+            # Then generate cover letter
+            cover_letter = gemini.generate_cover_letter(job_json, resume_path)
+            
+            if cover_letter:
+                # Create a professional filename for the cover letter
+                resume_filename = os.path.basename(resume_path)
+                base_name = os.path.splitext(resume_filename)[0]
+                cover_letter_base = base_name.replace("Resume", "Cover_Letter")
+                cover_letter_path = RESUME_DIR / f"{cover_letter_base}.txt"
+                
+                # Check for existing file
+                counter = 1
+                while cover_letter_path.exists():
+                    cover_letter_path = RESUME_DIR / f"{cover_letter_base}_v{counter}.txt"
+                    counter += 1
+                    
+                with open(cover_letter_path, 'w') as f:
+                    f.write(cover_letter)
+                    
+                print(f"\nCover letter generated successfully: {cover_letter_path}")
+            else:
+                print("\nError generating cover letter")
+                
+        elif output_type == 'generate_both':
+            # First generate resume
+            handler = ResumeHandler()
+            resume_path = handler.generate_resume(job_json)
+            
+            if not resume_path:
+                print("\nError generating resume")
+                return
+                
+            print(f"\nResume generated successfully: {resume_path}")
+            
+            # Then generate cover letter
+            cover_letter = gemini.generate_cover_letter(job_json, resume_path)
+            
+            if cover_letter:
+                # Create a professional filename for the cover letter
+                resume_filename = os.path.basename(resume_path)
+                base_name = os.path.splitext(resume_filename)[0]
+                cover_letter_base = base_name.replace("Resume", "Cover_Letter")
+                cover_letter_path = RESUME_DIR / f"{cover_letter_base}.txt"
+                
+                # Check for existing file
+                counter = 1
+                while cover_letter_path.exists():
+                    cover_letter_path = RESUME_DIR / f"{cover_letter_base}_v{counter}.txt"
+                    counter += 1
+                    
+                with open(cover_letter_path, 'w') as f:
+                    f.write(cover_letter)
+                    
+                print(f"\nCover letter generated successfully: {cover_letter_path}")
+            else:
+                print("\nError generating cover letter")
+        
+    except Exception as e:
+        print(f"\nError processing job description: {str(e)}")
+        import traceback
+        traceback.print_exc()
 
 def generate_cover_letter(job_description_file: str, resume_path: str) -> Optional[str]:
     """Generate cover letter from job description and resume"""
@@ -332,7 +467,7 @@ def main():
     
     parser.add_argument(
         '--mode',
-        choices=['auto', 'resume', 'cover', 'list', 'report', 'debug'],
+        choices=['auto', 'resume', 'cover', 'list', 'report', 'debug', 'process-description'],
         default='auto',
         help='Operation mode'
     )
@@ -345,6 +480,30 @@ def main():
     parser.add_argument(
         '--resume',
         help='Resume file for cover letter generation'
+    )
+    
+    parser.add_argument(
+        '--job-description',
+        help='Path to a text file containing a job description to process'
+    )
+    
+    parser.add_argument(
+        '--job-title',
+        default='Software Engineer',
+        help='Job title for the provided description (optional)'
+    )
+    
+    parser.add_argument(
+        '--company',
+        default='Unknown Company',
+        help='Company name for the provided description (optional)'
+    )
+    
+    parser.add_argument(
+        '--output-type',
+        default='generate_resume',
+        choices=['generate_resume', 'generate_cover_letter', 'save_json_only', 'generate_both'],
+        help='Output type for process-description mode'
     )
     
     parser.add_argument(
@@ -385,6 +544,25 @@ def main():
         
     elif args.mode == 'debug':
         debug_mode()
+        
+    elif args.mode == 'process-description':
+        if not args.job_description:
+            print("\nError: Job description file required for processing")
+            print("Example usage: python main.py --mode process-description --job-description job_desc.txt")
+            return
+            
+        # Ensure output directories exist
+        os.makedirs(JOBS_DIR, exist_ok=True)
+        os.makedirs(RESUME_DIR, exist_ok=True)
+        os.makedirs(Path('debug'), exist_ok=True)
+            
+        try:
+            process_job_description(args.job_description, args.job_title, args.company, args.output_type)
+        except Exception as e:
+            print(f"\nError in process-description mode: {str(e)}")
+            if DEBUG_MODE:
+                import traceback
+                traceback.print_exc()
 
 if __name__ == "__main__":
     main()
