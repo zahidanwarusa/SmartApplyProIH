@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Dict, Optional, Tuple, List, Set
 from urllib.parse import quote
 from datetime import datetime
-
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
@@ -81,91 +81,74 @@ class DiceBot:
             self.logger.addHandler(ch)
 
     def setup_driver(self) -> bool:
-        """Initialize Chrome WebDriver with anti-detection measures and handle existing browser sessions"""
+        """Initialize Chrome WebDriver with automatic driver management"""
         try:
-            # First try to close any existing Chrome processes to prevent profile conflicts
-            self.logger.info("Checking for existing Chrome processes...")
-            try:
-                if os.name == 'nt':  # Windows
-                    os.system("taskkill /f /im chrome.exe")
-                    os.system("taskkill /f /im chromedriver.exe")
-                else:  # Linux/Mac
-                    os.system("pkill -f chrome")
-                    os.system("pkill -f chromedriver")
-                time.sleep(2)
-                self.logger.info("Closed existing Chrome processes")
-            except Exception as e:
-                self.logger.warning(f"Failed to close existing Chrome processes: {str(e)}")
+            self.logger.info("Initializing Chrome WebDriver...")
             
-            # Create options with profile
+            # Import webdriver-manager
+            from webdriver_manager.chrome import ChromeDriverManager
+            
+            # Create Chrome options
             options = Options()
             
-            # Set profile paths
-            user_data_dir = CHROME_PROFILE['user_data_dir']
-            profile_directory = CHROME_PROFILE['profile_directory']
-            
-            # Add essential Chrome options
+            # Essential options
             options.add_argument('--start-maximized')
-            options.add_argument('--disable-extensions')
-            options.add_argument('--window-size=1920,1080')
-            options.add_argument('--disable-gpu')
+            options.add_argument('--disable-blink-features=AutomationControlled')
             options.add_argument('--no-sandbox')
             options.add_argument('--disable-dev-shm-usage')
-            
-            # Anti-detection options
-            options.add_argument('--disable-blink-features=AutomationControlled')
             options.add_experimental_option("excludeSwitches", ["enable-automation"])
             options.add_experimental_option('useAutomationExtension', False)
             
-            # Add User-Agent to appear as regular browser
+            # Set user agent
             options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36')
             
-            # Try with profile first
+            # Try with user profile first
             try:
-                profile_options = options
-                profile_options.add_argument(f'--user-data-dir={user_data_dir}')
-                profile_options.add_argument(f'--profile-directory={profile_directory}')
+                # Add profile arguments
+                user_data_dir = CHROME_PROFILE['user_data_dir']
+                profile_directory = CHROME_PROFILE['profile_directory']
                 
-                # Initialize ChromeDriver service
-                service = Service(executable_path=CHROMEDRIVER_PATH)
+                options.add_argument(f'--user-data-dir={user_data_dir}')
+                options.add_argument(f'--profile-directory={profile_directory}')
                 
-                # Initialize driver with profile
-                self.driver = webdriver.Chrome(service=service, options=profile_options)
-                self.wait = WebDriverWait(self.driver, 15)
-                self.logger.info("Initialized Chrome with user profile")
-            except Exception as profile_error:
-                # If profile fails, try without profile
-                self.logger.warning(f"Failed to initialize with profile: {str(profile_error)}")
-                self.logger.info("Trying to initialize Chrome without profile...")
+                # Use webdriver-manager to get the correct ChromeDriver
+                service = Service(ChromeDriverManager().install())
                 
-                # Add incognito mode to avoid profile issues
-                options.add_argument('--incognito')
-                
-                # Initialize driver without profile
-                service = Service(executable_path=CHROMEDRIVER_PATH)
+                # Create driver
                 self.driver = webdriver.Chrome(service=service, options=options)
                 self.wait = WebDriverWait(self.driver, 15)
-                self.logger.info("Initialized Chrome without user profile (incognito mode)")
+                
+                self.logger.info("Chrome initialized successfully with user profile")
+                
+            except Exception as profile_error:
+                self.logger.warning(f"Failed with profile: {str(profile_error)}")
+                self.logger.info("Trying without profile...")
+                
+                # Create new options without profile
+                options = Options()
+                options.add_argument('--start-maximized')
+                options.add_argument('--disable-blink-features=AutomationControlled')
+                options.add_argument('--no-sandbox')
+                options.add_argument('--disable-dev-shm-usage')
+                options.add_experimental_option("excludeSwitches", ["enable-automation"])
+                options.add_experimental_option('useAutomationExtension', False)
+                options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36')
+                
+                # Use webdriver-manager to get the correct ChromeDriver
+                service = Service(ChromeDriverManager().install())
+                self.driver = webdriver.Chrome(service=service, options=options)
+                self.wait = WebDriverWait(self.driver, 15)
+                
+                self.logger.info("Chrome initialized successfully without profile")
             
-            # Anti-detection script
-            self.driver.execute_cdp_cmd('Page.addScriptToEvaluateOnNewDocument', {
-                'source': '''
-                    // Override webdriver property
-                    Object.defineProperty(navigator, 'webdriver', {
-                        get: () => undefined
-                    });
-                    
-                    // Add language plugins to appear more human-like
-                    Object.defineProperty(navigator, 'languages', {
-                        get: () => ['en-US', 'en', 'es-ES', 'es']
-                    });
-                '''
-            })
+            # Execute script to hide webdriver property
+            self.driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
             
-            time.sleep(1)
+            # Maximize window
             self.driver.maximize_window()
+            time.sleep(1)
             
-            self.logger.info("WebDriver initialized successfully")
+            self.logger.info("WebDriver setup completed successfully")
             return True
             
         except Exception as e:
@@ -176,7 +159,7 @@ class DiceBot:
                 except:
                     pass
             return False
-    
+
     def random_delay(self, delay_type: str):
         """Add random delay between actions"""
         min_delay, max_delay = DELAYS.get(delay_type, (2, 5))

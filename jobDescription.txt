@@ -1,11 +1,43 @@
-Need someone with Healthcare Background
-Need someone really Strong on VB Script and UFT
+Company: Disney
 
-Role: SDET with VB and UFT
-Duration: Long Term
-Location: Remote but need candidate from EST only
-Client: Excellus Health Plans
+Position: QA Lead
 
+100% Remote
 
-Need candidate from Healthcare Background
-Need Strong SDET with VBScript  and UFT "Unified Functional Testing"
+ 
+
+Job Description
+As part of the Program Management & Enabling Technologies team, you will get to work with a growing team of Backend and Frontend Developers. You will bring your expertise in writing and executing functional test cases for the Studio Technology Initiatives. You will help build a robust manual regression testing suite that can be leveraged for future test automation. This will be accomplished by using Agile testing best practices to plan and execute testing. You will be a valued part of the team and provide input on improving testing and operational practices. Your duties include compiling comprehensive test scripts and plans, bring ideas to speed and ease the testing processes, and maintaining clear and thorough communication with leadership.
+Responsibilities
+• Create and implement detailed, comprehensive and well-structured test scripts and plans for applications/products, in particular ones related to financial planning
+• Design, develop and execute automation scripts using open source tools, such as Selenium and Python.
+• Identify procedures and scenarios for the quality control of products and services
+• Process end-user reviews and inform the development team of defects and errors
+• Perform thorough regression testing when bugs are resolved
+• Communicate quantitative and qualitative findings from test results to the development and executive team
+• Monitor efforts to resolve product issues and track progress
+• Ensure that the final product satisfies the product requirements and meet end-user expectations
+• Spot areas for improvement to enhance the product's efficiency
+• Review requirements, specifications and technical design documents to provide timely and meaningful feedback
+• Track quality assurance metrics, like defect densities and open defect counts
+• Stay up-to-date with new testing tools and test strategies
+
+Basic Qualifications:
+• Extensive experience in quality control and keen attention to detail
+• Excellent analytical and problem-solving skills
+• Excellent verbal and written communication skills
+• Creative and innovative thinker
+• Great team player and able to work efficiently with minimal supervision
+• Recommend improvements in software to enhance user experience
+• Motivate the development process for efficiency and performance
+• Experience with SQL, Java, Python, PowerBI. (powerBI is “Not a must have but they NEED TO HAVE STRONG ANALYTICS testing experience).
+• Solid understanding of and experience with automated testing frameworks and tools (e.g., Selenium, JUnit, Cucumber, TestNG).
+• Experience with Project Management and Agile Scrum
+
+Preferred Qualifications:
+• 6-7+ years of experience in software testing
+• Excellent problem-solving skills
+• Experience in quality inspection, auditing, and testing
+• Excellent communication skills, both written and verbal
+• Strong computer skills and knowledge of QA databases and applications
+• Meticulous attention to detail

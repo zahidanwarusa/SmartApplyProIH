@@ -1,0 +1,441 @@
+{
+    "header": {
+      "name": "Zahid Anwar",
+      "email": "zahidsdet@gmail.com ",
+      "phone": "(703) 909-5672",
+      "citizenship": "US Citizen",
+      "linkedin": "www.linkedin.com/in/zahid-anwar"
+    },
+    "education": [
+      {
+        "university": "Strayer University, USA",
+        "degree": "MBA",
+        "major": "Information Technology",
+        "year": "2016"
+      },
+      {
+        "university": "University of Sargodha",
+        "degree": "MS",
+        "major": "Economics",
+        "year": "2007"
+      },
+      {
+        "university": "University of Sargodha",
+        "degree": "BSc",
+        "major": "Mathematics & Computer Science",
+        "year": "2003"
+      }
+    ],
+    "career_summary": [
+      "With over 10 years of experience in the IT industry, specializing in **QA Engineering** and **Software Development Engineering in Testing (SDET)**, I bring extensive expertise in **test automation frameworks**, **test planning**, and **cross-functional collaboration**.",
+      "I currently serve as **Lead SDET/Technical Test Lead** at **SunTrust**, overseeing multiple projects and teams. My role involves designing and implementing comprehensive **UI/Mobile/API automation frameworks** using **Selenium**, **Rest Assured**, **Appium**, and **BDD frameworks** like **Cucumber**, with a strong focus on ensuring seamless **system integrations** and **workflow validation** within **Salesforce** and **nCino** environments. I excel in developing **test strategies** for **cloud-based environments**, utilizing **Docker** and **Kubernetes** for **containerized testing**.",
+      "I bring extensive expertise in **HL7 FHIR standards**, **test automation**, and **healthcare compliance**. Currently serving as **Technical Test Lead**, I have deep experience in **healthcare software testing**, including **HIPAA compliance**, **HL7 protocols**, and **EDI integrations**. My background includes developing comprehensive **test automation frameworks** for **FHIR APIs**, implementing **performance testing** using **JMeter**, and managing **AWS cloud** testing environments. I excel in creating detailed **test plans**, building **automated test tools**, and ensuring thorough **documentation** for healthcare applications.",
+      "I have successfully architected and maintained **CI/CD pipelines** integrated with **Jira**, **QTest**, and **Jenkins**, ensuring seamless automated testing during deployments. My proficiency extends to **API testing** and **Rest Assured** framework development, where I perform detailed tests on loan origination systems and ensure smooth functionality of both **Salesforce** and **nCino** solutions. I manage testing environments in **AWS**, utilizing **EC2**, **RDS**, and other cloud services for comprehensive testing scenarios. As a technical leader, I excel in **mentoring team members**, providing thorough **code reviews**, and fostering an **automation-first culture**. I regularly collaborate with **developers**, **QA analysts**, and **DevOps teams** to ensure optimal test coverage and alignment with project goals. My role includes researching and evaluating **new testing tools** and **technologies** to enhance automation coverage and efficiency.",
+      "I provide regular updates on **testing progress**, **risks**, and **mitigation plans** to stakeholders, ensuring transparent communication and project success. My strong **analytical**, **problem-solving**, and **interpersonal** skills enable me to deliver high-quality solutions while maintaining strong relationships with cross-functional teams."
+    ],
+    "professional_summary": {
+      "overview": "Actively seeking a position as a **Software Test Lead** / **Software Development Engineer in Testing (SDET)**, allowing me to use my skills and to lend my expertise to the success of an organization.",
+      "highlights": [
+        "Extensive experience in designing, developing, and implementing **test automation frameworks** for **UI**, **Mobile**, **API**, and **Database** testing, encompassing **functional**, **regression**, and **integration** testing.",
+        "Expert in leading teams to complete projects using both **Manual** and **Automation Testing**, with proven success in building and maintaining test cases using **BDD framework** with **Java/Python/TypeScript** and tools like **Cucumber**.",
+        "Strong proficiency in collaborating with **developers**, **QA analysts**, and **DevOps** teams to integrate and maintain **automated tests** into **CI/CD pipelines** using tools like **Jenkins**, ensuring seamless testing during deployments.",
+        "Extensive experience in **HL7 FHIR standard** implementation and testing, ensuring compliance with healthcare industry standards.",
+        "Expert in designing and executing **FHIR API** test strategies and automation frameworks using Python and modern testing tools.",
+        "Strong proficiency in developing automated test harnesses and tools for healthcare applications using **Python** and **AWS services**.",
+        "Extensive knowledge in **healthcare data standards** including **HL7, HIPAA, and EDI** implementations.",
+        "Proven expertise in performance testing using **JMeter** for healthcare applications and APIs.",
+        "Demonstrated success in creating comprehensive **test plans** and **documentation** for complex healthcare systems.",
+        "Strong experience with AWS cloud technologies for healthcare application testing and deployment.",
+        "Expert in **healthcare compliance testing** and validation of medical record systems.",
+        "Proficient in implementing test automation frameworks for healthcare APIs and web services.",
+        "Strong background in **healthcare claims processing** and **provider systems** testing.",
+        "Proven experience in developing **test strategies** for **cloud-based environments**, utilizing **Docker** and **Kubernetes** for **containerized testing**, while managing **AWS** test environments with **EC2**, **RDS**, and **CodePipeline**.",
+        "Demonstrated success in analyzing **system requirements** and designing efficient **test plans** and **test scripts** for optimal coverage across various testing types including **Unit**, **Integration**, **System**, and **Load Testing**.",
+        "Excellence in acting as a liaison between **core test automation framework** development team, **functional testing** team, and **delivery teams** to identify test requirements and ensure alignment with project goals.",
+        "Expertise in mentoring team members, providing thorough **code reviews**, and fostering an **automation-first culture** within the team while maintaining high standards of quality.",
+        "Solid knowledge of **Relational Databases**, **Data Modeling**, and **Analytics** skills, with extensive experience in **SQL Script** writing, testing, and debugging.",
+        "Proficient in working under different software development methodologies such as **Agile (SCRUM)**, **RUP**, and **V&V**, ensuring adaptability to various project requirements.",
+        "Strong track record in providing regular updates on **testing progress**, **risks**, and **mitigation plans** to stakeholders, maintaining transparent communication throughout the project lifecycle.",
+        "Extensive experience in implementing and maintaining **test automation frameworks** using **Gradle/Maven** platforms, ensuring robust and scalable testing solutions.",
+        "Proven expertise in developing **custom testing tools** and **utilities** to support automation efforts and improve team productivity.",
+        "Strong proficiency in **mobile testing automation** using **Appium**, covering both **iOS** and **Android** platforms for comprehensive mobile application testing.",
+        "Demonstrated success in implementing **parallel test execution** strategies to optimize test runtime and resource utilization.",
+        "Proficient in **version control systems** like **Git**, managing code repositories, and maintaining branching strategies for test automation code.",
+        "Strong experience in implementing **security testing** protocols, including **Authorization Testing**, **Access Control Testing**, and **Encryption/Decryption** validation.",
+        "Expertise in **cross-browser testing** automation, ensuring application compatibility across different browsers and versions.",
+        "Demonstrated success in implementing **automated reporting mechanisms** using tools like **Extent Reports** and **Allure**, providing detailed test execution insights to stakeholders.",
+        "Proficient in **API contract testing** using tools like **Pact** and **Swagger**, ensuring reliable integration between services.",
+        "Strong experience in implementing **test data management strategies, including data creation, cleanup, and maintenance for automated tests.**",
+        "Skilled at managing multiple concurrent employment responsibilities while maintaining exceptional performance across projects.",
+        "Proficient in remote work environments with demonstrated ability to balance multiple roles effectively."
+      ]
+    },
+    "technical_skills": {
+      "programming_languages": ["JAVA", "C", "C++", "SQL", "PL/SQL", "Python"],
+      "testing_tools": ["Selenium", "REST API", "Quick Test Professional", "Load Runner", "Win Runner", "Restassured", "JMeter", "Insomnia", "Informatica IDQ", "MDM tool functionalities"],
+      "testing_and_bug_reporting": ["Quality Center", "Rational Clear quest", "RQM", "Jira", "QTest"],
+      "databases": ["Oracle", "SQL Server", "MS-Access", "Mongo DB"],
+      "operating_systems": ["Windows", "UNIX"],
+      "domain_experience": ["Healthcare", "Financial", "Insurance", "Capital Markets"],
+      "ms_office_tools": ["Word", "Excel", "PowerPoint"],
+      "web_browsers": ["Internet Explorer", "Mozilla Firefox", "Google Chrome"],
+      "methodology": ["Agile", "Waterfall", "Modern Delivery"],
+      "ci_cd_tools": ["Gitlab", "Jenkins", "Github"],
+      "additional_skills": ["Multi-project Management", "Remote Work Efficiency", "Time Management", "Cross-functional Collaboration"]
+    },
+    "work_experience": [
+      {
+        "company": "YOH Company",
+        "location": "Woodbridge, VA (Remote)",
+        "position": "Software QA Professional",
+        "duration": "May 2024 - Present",
+        "summary": "Contributing to software quality assurance initiatives while working remotely and balancing with other professional commitments.",
+        "achievements": [
+          "Execute testing protocols according to project requirements",
+          "Collaborate with development teams to ensure product quality",
+          "Work remotely while balancing with other professional commitments"
+        ],
+        "environment": "Remote work environment, Software QA tools"
+      },
+      {
+        "company": "Unissant Inc",
+        "location": "Woodbridge, VA (Remote)",
+        "position": "Software QA Professional",
+        "duration": "April 2024 - Present",
+        "summary": "Contributing to software quality assurance initiatives and collaborating with development teams to ensure product quality.",
+        "achievements": [
+          "Execute testing strategies aligned with project requirements",
+          "Collaborate with development teams to ensure product quality",
+          "Work remotely from Woodbridge, VA location"
+        ],
+        "environment": "Remote work environment, Software QA tools"
+      },
+      {
+        "company": "Infinite Computer Solutions",
+        "location": "Woodbridge, VA (Remote)",
+        "position": "Software QA Professional",
+        "duration": "December 2024 - Present",
+        "summary": "Performing software testing and quality assurance functions while balancing responsibilities with other concurrent positions.",
+        "achievements": [
+          "Identify and document software defects",
+          "Participate in agile development processes",
+          "Balance responsibilities with other concurrent positions"
+        ],
+        "environment": "Remote work environment, Agile processes, Software QA tools"
+      },
+      {
+        "company": "Suntrust Bank",
+        "location": "Richmond, VA",
+        "position": "Technical Test Lead",
+        "duration": "July 2020 - Current",
+        "summary": "Serve as **Lead SDET** for \"RESOLVE\" project. Build and implemented **RestAssured Framework** to fulfill needs of Automation testing. Build and enhanced **Selenium Framework** in multiple Projects for \"Workout Prospector\" application. Has successfully tested the multiple releases for multiple **API/Web Services** projects. I have been performing Database Testing on multiple databases including **SQL Server, Post Grace and Oracle** during transition of data. I also participated in Requirements Review, worked with Business Analyst and Developers to deliver quality product.",
+        "achievements": [
+          "**Building up and leading** the Testing Team to the success of project",
+          "Responsible for Participating in requirements, functional specification and technical specification reviews",
+          "**Planning, deploying and managing** the testing effort for any given engagement",
+          "Defining the **scope of testing** within the context of each release / delivery",
+          "Extensive knowledge in entire **Software Development Life Cycle**- Business requirements analysis, Design, Development and testing",
+          "**Developed and executed detailed test plans** and test cases, incorporating both manual and automated tests for seamless integration of Salesforce-based applications",
+          "Leading Team to Complete Project using both **Manual/Automation Testing**",
+          "Performed **API/Web Services testing using Rest Assured Library**",
+          "Designed and implemented comprehensive **test automation frameworks** for **UI** (**Selenium**), **API** (**RestAssured**), and **Mobile testing**, achieving 80% automation coverage across the application landscape",
+          "Used **Gradle/Maven Platforms to build Automation Framework**",
+          "Deploying and managing resources for testing",
+          "Developed a **communication plan** with client and project team in reporting testing progress, issues and defects",
+          "**Defined testing strategies and methodologies** to ensure comprehensive coverage for **nCino** solutions, prioritizing test scenarios based on business requirements and risk assessments",
+          "**Facilitation** of inter-team communication across many agile projects within an organization",
+          "**Budgeting or forecasting for testing** as a service dependent on organizational process",
+          "Personal support, **mentoring, and professional development** for testers",
+          "Providing **technical expertise**, e.g. proper use of test techniques in appropriate cases",
+          "Ensure QA best practices are established and that quality is baked in from start.",
+          "Architected and maintained **BDD test frameworks** using **Cucumber** and **Java/TypeScript**, improving collaboration between business and technical teams and reducing requirement ambiguity by 40%",
+          "Applied the set of operations, and disciplines for the **planning, analysis, design and construction of information systems** across a major sector of the organization",
+          "Implemented comprehensive **API testing** strategies using **RestAssured**, covering both functional and performance aspects, resulting in 75% reduction in production issues",
+          "**Integrated Salesforce** with internal systems, collaborating with business analysts to validate **user stories** and ensure functionality for sales and customer management",
+          "**Enhanced loan origination systems**, Successfully conducted **load** and **performance testing** using **AWS** services, including **Load Balancer** and **Auto Scaling**",
+          "**Implemented automated environment provisioning and teardown procedures using Infrastructure as Code principles.**",
+          "Responsible for performing **analysis of requirements, writing requirements verification points and providing feedback on requirement testability**",
+          "Proficient in configuring and managing AWS test environments, leveraging **services like EC2 and RDS to replicate real-world** scenarios for comprehensive software testing",
+          "Configured and maintained **containerized testing** environments using **Docker** and **Kubernetes**, improving test environment stability by 70%",
+          "**Contributed to the enhancement of loan origination systems** by implementing **automation tests** for loan application processes, ensuring high-quality and seamless transactions",
+          "**Conducted regular code reviews and provided technical guidance, improving code quality and reducing technical debt by 40%.**",
+          "Utilized **AWS CloudWatch** for real-time monitoring, generating insightful reports and alerts to ensure software reliability and performance optimization",
+          "Successfully conducted load and performance testing using AWS services, **including Load Balancer and Auto Scaling**, optimizing application performance",
+          "Supported the identification and debugged of software defects and championed the resolution of bugs and issues",
+          "Executed load and stress tests using JMeter to simulate realistic user scenarios .",
+          "Take Lead in ensuring the development and execution of **Automation Scripts with Selenium and Rest API using Rest Assured** **development manual test cases in ALM** and executing tests according to software test processes and procedures",
+          "Used Selenium and section to manage and organize STLC activities like Requirements coverage, **Test Case Management, Test Execution Reporting**, Defect Management, and Test Automation",
+          "Provided regular updates on **testing progress**, **risks**, and **mitigation strategies** to senior management and stakeholders",
+          "Updated the **Multiple SOPs** to increase overall productivity and performance"
+        ],
+        "environment": "Windows, Jira, Web Services, Git, Java, Automation, Eclipse, Selenium, Oracle, SQL Server, PostGrace, Manual Testing, MS Office Suite"
+      },
+      {
+        "company": "Infosys",
+        "location": "Woodbridge, VA (Remote)",
+        "position": "Technical Team Lead (TTL)",
+        "duration": "August 2017 - July 2024",
+        "summary": "Managed software testing initiatives while working remotely. Collaborated with cross-functional teams to ensure quality deliverables.",
+        "achievements": [
+          "Led QA implementation strategies and testing protocols",
+          "Managed software testing initiatives while working remotely from Woodbridge, VA",
+          "Collaborated with cross-functional teams to ensure quality deliverables",
+          "Maintained this position while simultaneously holding other roles"
+        ],
+        "environment": "Remote work environment, QA tools, Agile methodologies"
+      },
+      {
+        "company": "Pursuite Software",
+        "location": "Remote",
+        "position": "Software Tester",
+        "duration": "February 2021 - July 2023",
+        "summary": "Executed comprehensive test plans for software applications while working remotely and collaborating with international development teams.",
+        "achievements": [
+          "Executed comprehensive test plans for software applications",
+          "Identified and reported bugs through systematic testing procedures",
+          "Collaborated with international development teams working remotely",
+          "Managed this role concurrently with other employment"
+        ],
+        "environment": "Remote work environment, Bug tracking systems, Test management tools"
+      },
+      {
+        "company": "ClearBridge Technology Group",
+        "location": "Remote",
+        "position": "Senior Test Engineer",
+        "duration": "August 2021 - December 2022",
+        "summary": "Led advanced testing initiatives for enterprise applications and developed automated testing frameworks to improve efficiency.",
+        "achievements": [
+          "Led advanced testing initiatives for enterprise applications",
+          "Developed automated testing frameworks to improve efficiency",
+          "Project concluded due to annual budget adjustments"
+        ],
+        "environment": "Test automation frameworks, Enterprise applications"
+      },
+      {
+        "company": "Merican Inc",
+        "location": "Remote",
+        "position": "QA Analyst (Part-time)",
+        "duration": "July 2022 - December 2022",
+        "summary": "Conducted specialized testing for targeted applications and provided quality assurance support on a flexible schedule.",
+        "achievements": [
+          "Conducted specialized testing for targeted applications",
+          "Provided quality assurance support on a flexible schedule",
+          "Contributed to project until completion due to scope changes"
+        ],
+        "environment": "Flexible remote work arrangement, QA tools"
+      },
+      {
+        "company": "Lighthouse Technology Services",
+        "location": "Remote",
+        "position": "QA Analyst (Part-time)",
+        "duration": "April 2022 - October 2022",
+        "summary": "Performed specialized testing for financial applications while maintaining flexible hours to accommodate project demands.",
+        "achievements": [
+          "Performed specialized testing for financial applications",
+          "Maintained flexible hours to accommodate project demands",
+          "Successfully completed contract requirements"
+        ],
+        "environment": "Financial applications, Remote testing environment"
+      },
+      {
+        "company": "Synthesis Ltd",
+        "location": "Remote",
+        "position": "QA Analyst",
+        "duration": "September 2020 - March 2022",
+        "summary": "Executed comprehensive testing protocols for enterprise software and documented and tracked software defects through resolution.",
+        "achievements": [
+          "Executed comprehensive testing protocols for enterprise software",
+          "Documented and tracked software defects through resolution",
+          "Contributed until project requirements changed"
+        ],
+        "environment": "Enterprise software, Defect tracking systems"
+      },
+      {
+        "company": "Scopit LLC",
+        "location": "Remote",
+        "position": "Software Tester",
+        "duration": "June 2021 - August 2021",
+        "summary": "Performed testing functions for software applications and collaborated with international team members.",
+        "achievements": [
+          "Performed testing functions for software applications",
+          "Collaborated with international team members",
+          "Left position due to work environment concerns"
+        ],
+        "environment": "International collaboration tools, Software testing platforms"
+      },
+      {
+        "company": "LTI",
+        "location": "Woodbridge, VA (Remote)",
+        "position": "Specialist",
+        "duration": "January 2021 - June 2021",
+        "summary": "Provided technical support and testing services while working remotely.",
+        "achievements": [
+          "Provided technical support and testing services",
+          "Worked remotely from Woodbridge, VA location",
+          "Position ended due to skill set alignment considerations"
+        ],
+        "environment": "Remote technical support tools, Testing platforms"
+      },
+      {
+        "company": "Computer Arithmatic",
+        "location": "Remote",
+        "position": "Software Tester",
+        "duration": "March 2021 - May 2021",
+        "summary": "Executed software testing procedures while working remotely in a short-term position that overlapped with other employment.",
+        "achievements": [
+          "Executed software testing procedures",
+          "Worked remotely from home office",
+          "Short-term position that overlapped with other employment"
+        ],
+        "environment": "Remote work environment, Software testing tools"
+      },
+      {
+        "company": "Aetna Health Insurance",
+        "location": "Franklin, TN",
+        "position": "Technical Test Lead",
+        "duration": "Aug 2017 - June 2020",
+        "summary": "Functioned as Test Lead to build a team and successfully test multiple projects, Defined Test Strategy and allocated the testing resources as per project need. The project was to understand the **Medicare Claims Adjudication System**, end to end, to fill the gaps in the system and incorporate the new CMS directives. Made test scenarios and helped with test cases to test the functionality of the system.",
+        "achievements": [
+          "Led end-to-end testing initiatives for healthcare applications, focusing on **Medicare Claims Adjudication System** and **FHIR API** implementations",
+          "Performed **End to End scenarios** by validating from front end application to DB2 database",
+          "Performed **Functional Testing of Medicare and Medicaid Claims.**",
+          "Developed and executed thorough **HL7 testing protocols,** ensuring compliance with regulatory standards and industry requirements, and contributing to the delivery of high-quality and reliable healthcare software solutions",
+          "Extensive experience in testing applications including in** Provider, Group, subscriber/Family, membership and billing.**",
+          "Good experience working with **Provider Portal and FACETS-PROVIDER MODULE.**",
+          "Excellent Working Knowledge of **HIPPA, Claims Processing**, FACETS.",
+          "Developed and executed thorough **HL7/FHIR testing protocols**, ensuring compliance with regulatory standards and industry requirements",
+          "Analyzed and implemented testing strategies for **HIPAA**, **HL7**, and **EDI X12** regulations in electronic medical record software",
+          "Validated **EDI Claim** processes according to **HIPAA compliance** standards",
+          "Extensive experience in testing applications including in **Provider, Group, subscriber/Family, membership and billing.**",
+          "Executed load and stress tests using **JMeter** to simulate realistic user scenarios for a healthcare",
+          "Collaborated with developers to identify and resolve performance issues impacting **healthcare claims processing efficiency.**",
+          "Experienced Quality Assurance professional in **healthcare** claims industry",
+          "Proven track record of ensuring accuracy, integrity, and compliance in **claims processes**",
+          "Strong knowledge of **industry standards, regulations, and best practices**",
+          "Attended **scrum meetings** as per **agile methodology.**",
+          "Prepared Manual Test Scenarios and Test Cases for the Application under test",
+          "Was responsible for tracking and writing the **Traceability Matrix.**",
+          "Analyzed the laws and regulations **(HIPAA, HL7, and EDI X 12)** before implementing the electronic medical record software",
+          "Performed manual testing at initial stages followed by majority of automated testing",
+          "Validate **EDI Claim** process according to HIPAA compliance",
+          "Developed and executed various test cases for testing **HIPAA 837I/P (4010)**",
+          "Used **Quality Center** to run test scripts and log defects"
+        ],
+        "environment": "Windows, Quality Center, Web Services, Oracle, UNIX, HIPAA regulations, Manual Testing, MS Office Suite"
+      },
+      {
+        "company": "Technical Resources International, DMID CROMS",
+        "location": "Bethesda, MD",
+        "position": "Sr Software Tester",
+        "duration": "Dec 2014 - July 2017",
+        "summary": "Participated in risk assessments and impact analysis of various implementation scenarios to present to the management for their recommendations. Functioned as a lead Software Tester for CROMS Data Exchange, CROMS Web Library, and CROMS Document Library. Successfully tested multiple releases for Web Services. Performed Database Testing on multiple databases during transition of data. Also worked on CMS release as IT Software Tester. Reviewed Requirements, worked with Business Analyst and Developers to deliver quality product.",
+        "achievements": [
+          "Prepared test plans, test strategy documents and test estimations for various releases",
+          "Developed a communication plan with client and project team in reporting testing progress, issues and defects",
+          "Applied the set of operations, and disciplines for the planning, analysis, design and construction of information systems across a major sector of the organization",
+          "Participated in test case coverage, test case design, and script design and reviews",
+          "Developed test scripts along with maintaining and enhancing the automated test framework supporting a continuous integration environment with automated smoke and regression testing",
+          "Ensured high test and code coverage, maintainability of scripts, reliability of equipment, and overall robustness of environment and solution during the entire development cycle",
+          "Responsible for performing analysis of requirements, writing requirements verification points and providing feedback on requirement testability",
+          "Responsible for having a thorough understanding of the projects test environment(s) and the projects policies for working in the test environment(s)",
+          "Responsible for integration testing applications as appropriate to use on the internet portal",
+          "Responsible for working with a team including development, system engineering and customer representatives in combined integration test efforts",
+          "Involved in continuous support of overall software quality and testing with continuing refactoring of scripts and test cases as required and enhanced test coverage (system, performance, interoperability, stress, negative testing, etc.)",
+          "Clearly logged defects, maintained test data and results, and monitored/analyzed automated test runs and reports",
+          "Supported the identification and debugged of software defects and champion the resolution of bugs and issues",
+          "Wrote SQL, PL/SQL scripts used RDBMS testing especially CRUD operations and verified ACID properties with the SQL queries on databases",
+          "Responsible for developing manual test cases in Rational Quality Management and executing tests according to software test processes and procedures",
+          "Responsible for developing automated test cases within Rational Functional Tester and custom scripting as appropriate to the test case",
+          "Used IBM Rational Requirement Management and Rational Configuration Management section to manage and organize STLC activities like Requirements coverage, Test Case Management, Test Execution Reporting, Defect Management, and Test Automation",
+          "Provided test status report for the pinnacle management",
+          "Trained the staff of CROMS Products",
+          "Updated the Multiple SOPs to increase overall productivity and performance"
+        ],
+        "environment": "Windows, IBM Rational Tools, Web Services, Oracle, SQL, Manual Testing, MS Office Suite"
+      },
+      {
+        "company": "Dean Health Plan",
+        "location": "Madison, WI",
+        "position": "Sr. QA Tester",
+        "duration": "Aug 2014 - Dec 2014",
+        "summary": "Performed complex testing of the 835 Transactions returned by DHP to Emdeon and Explanation of Payment (EOP) generated by Emdeon for new vendor (FedMed). Worked with data collection for computer systems to streamlined where the data collection was taken from and how it got to point of use, to ensure the success of the project.",
+        "achievements": [
+          "Worked with data collection for computer systems to streamlined where the data collection was taken from and how it got to point of use",
+          "Participated in requirements, functional specification and technical specification reviews",
+          "Worked with developers, database administrator and analysts to resolve issues resulting from testing",
+          "Resolved conflicts between technical specifications and functional specifications",
+          "Provided accurate estimates of effort and time-lines for completion of assigned tasks",
+          "Identified performance issues",
+          "Involved in set up the UAT environment and manage the test environment",
+          "Coordinated the review and sign off on test plans",
+          "Prepared Test plans, Test Strategy documents and Test estimations for various releases",
+          "Uploaded the Automated Test Scripts, created a Test Set and executed test cases and filing issues in defect tracking system using Quality Center",
+          "Conducted Defect Management activities in Quality Center (track defects, ensure assignment, organize Defect Meetings, ensure defects are retested, create Defect Summary reports) or share those responsibilities with other QA Analysts on the project",
+          "Built out and maintained a library of test scripts for regression testing",
+          "Developed and maintained QTP/UFT scripts for Sanity and Regression testing",
+          "Wrote VB Scripts wherever required to increase the efficiency of automation in QTP/UFT",
+          "Worked in close collaboration with departmental managers, supervisors and training staff to provide feedback in deficient areas identified during quality monitoring",
+          "Performed Performance/Load test using Load Runner",
+          "Created specific scenarios for load balance testing with Load Runner like fail over server during peak traffic period",
+          "By using Load Runner Analysis, generated various reports for higher management",
+          "Monitored/analyzed server performance in various virtual users load",
+          "Created various Web Scripts for the Application using Load Runner",
+          "Involved in coordinating with SME to discuss different scenarios at the time of scripting Test Cases",
+          "Worked SDS portal view to make sure that the system can accommodate the new vendor",
+          "Tested claim using DDE and X-12 files through Online Portal",
+          "Review and Approve the Detailed Requirements, Configuration Impact Assessment, LSA -- Logical Solution Architecture, TDD -- Technical Design Documents",
+          "Contributed to the Traceability Matrix (started by the BA)",
+          "Understood dependencies and communicate/escalate dependency needs as appropriate",
+          "Contributed to status reports for the Overall Project & Create QA Status Reports",
+          "Coordinated testing efforts for internal/external resources",
+          "Conducted testing meetings, generate minutes, and document in Quality Center",
+          "Contributed to testing schedule creation, updating, and communication (give these to the PM to document in the overall Project Schedule)",
+          "Managed On-boarding new QA resources to the project an elicit help from project team for onboarding, when needed",
+          "Attended both the QA Cross-Team Meetings and the Environment Utilization Meetings, or responsible for sending a delegate",
+          "Reported back information from these meetings to the rest of project team for impact and further discussion",
+          "Created testing estimates as needed by PM and raise/document issues that could impact the testing timeline"
+        ],
+        "environment": "Test manager, ALM HP Quality Center 11, QTP/UFT, SQL, Java, Oracle, METAVANCE, Agile, Scrum, HIPAA"
+      },
+      {
+        "company": "Xerox State Healthcare",
+        "location": "West Sacramento, CA",
+        "position": "Sr. QA Tester",
+        "duration": "Dec 2013 - Aug 2014",
+        "summary": "Worked on Data Validation and Data Verification for Crosswalk Mapping File on Customer Information Control System (CICS) Screens, worked on code validation on ICD9 & ICD10 Codes in Update File for Crosswalk Mapping File, worked on creating specifications for transitioning business from HIPAA 4010A to 5010 and from ICD-9 to ICD-10. Involved with testing and using ICD 9/ICD 10 coding standards in Medicare and Medicaid domains of the healthcare systems and industry for inpatients, outpatients, reimbursement methodology.",
+        "achievements": [
+          "Interpreted software specifications and user requirements into performance test scenarios",
+          "Planed, designed, executed test plans and test cases for automated test and manual test to support maintenance releases for multiple GUI/web based applications",
+          "Prepared test plans, test strategy documents and test estimations for various releases",
+          "Developed a communication plan with client and project team in reporting testing progress, issues and defects",
+          "Defined and created automated test scripts in conjunction with development resources",
+          "Proactively took initiative and demonstrated a high level of accountability",
+          "Wrote automation test plans and prepared the automation test matrix for each regression cycle",
+          "Installed product built on test environments and maintained test environments",
+          "Performed application, regression, and acceptance testing",
+          "Handled multiple projects simultaneously, and tested on a variety of platforms",
+          "Enforced standards and regularly participated in process improvement activities",
+          "Developed and maintained RQM scripts for Functional, Regression and Navigational testing of the application",
+          "Performed back-end testing to ensure that the user data was updated in database using SQL",
+          "Tested enhancements and bug fixes for software releases and patches and document findings",
+          "Responsible for quality support of new product development process",
+          "Provided a systematic review process and resources to assured all products met regulatory and conformant requirements prior to client release",
+          "Prepared the Test data and performed User Acceptance Testing",
+          "Involved in coordinating with SME to discuss different scenarios at the time of scripting Test Cases",
+          "Worked on Data Validation and Data Verification for Crosswalk Mapping File on CICS Screens",
+          "Worked on code validation on ICD9 & ICD10 Codes in UPDATE File for Crosswalk Mapping File",
+          "Worked on creating specifications for transitioning business from HIPAA 4010A to 5010 and from ICD-9 to ICD-10",
+          "Tested EDI transactions, 834, 837, 835, etc. for scenarios after ICD-10 implementation",
+          "Tested claim using DDE and X-12 files through Online Portal",
+          "Exposed to using ICD 9/ICD 10 coding standards in Medicare and Medicaid domains of the healthcare systems and industry for inpatients, outpatients, reimbursement methodology",
+          "Created Job Aid for UPDATE Process of Crosswalk Mapping File",
+          "Organized training sessions for more than 40 Team members to develop the understanding on Update Process of Crosswalk Mapping File",
+          "Gathered and validated inventory of applications, interfaces, and reports that will need to be modified to comply with ICD-10 requirements",
+          "Change requests are made using Rational Clear Quest",
+          "Extensively involved in managing defects using Clear Quest and interacted with DEV team in resolving critical and high defects",
+          "Extensively involved in UAT support for their execution and Defect Triage"
+        ],
+        "environment": "Clear Quest, Test manager, Waterfall, RQM, Mainframe, Uncle Bob, HIPAA, SQL SERVER, MS Project, MS Office, Visio"
+      }
+    ]
+  }
