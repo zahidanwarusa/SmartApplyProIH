@@ -33,7 +33,7 @@ BLACKLISTED_COMPANIES = [
 
 
 # API limits and settings
-API_DAILY_LIMIT = 1500  # Maximum requests per day per key
+API_DAILY_LIMIT = 800  # Maximum requests per day per key
 API_WARNING_THRESHOLD = 0.85  # Warn when usage reaches 85% of limit
 
 # Chrome Settings
@@ -77,16 +77,10 @@ MAX_RETRIES = {
 # Job Search Settings
 JOB_TITLES = [
   "SDET",
-  "Software Development in Test",
   "QA Automation",
   "Test Automation",
   "Senior SDET",
-  "Lead SDET",
-  "Healthcare SDET",
-  "Medical Device SDET",
-  "Clinical Systems SDET",
-  "Healthcare Test ",
-  "Healthcare QA"
+  "Lead SDET"
 ]
 
 # Search URL template

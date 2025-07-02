@@ -34,7 +34,7 @@ class GeminiService:
         """Initialize Gemini AI with current API key"""
         current_key = self.api_key_manager.get_current_key()
         genai.configure(api_key=current_key)
-        self.model = genai.GenerativeModel("gemini-1.5-flash")
+        self.model = genai.GenerativeModel("gemini-2.5-flash-lite-preview-06-17")
         self.logger.info("Configured Gemini with current API key")
 
     def _handle_api_error(self, error):

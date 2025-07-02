@@ -186,98 +186,139 @@ class DiceBot:
             # Method 1: Get the data-id attribute directly from the card (new UI)
             job_id = card.get_attribute("data-id")
             if job_id:
+                self.logger.debug(f"Found job ID from data-id: {job_id}")
                 return job_id
                 
-            # Method 2: Extract from the job link (fallback)
+            # Method 2: Get the data-job-guid attribute (new UI)
+            job_guid = card.get_attribute("data-job-guid")
+            if job_guid:
+                self.logger.debug(f"Found job ID from data-job-guid: {job_guid}")
+                return job_guid
+                
+            # Method 3: Extract from the job link URL (new UI)
             try:
                 job_link = card.find_element(By.CSS_SELECTOR, "a[data-testid='job-search-job-detail-link']")
                 job_url = job_link.get_attribute("href")
                 
                 if '/job-detail/' in job_url:
                     job_id = job_url.split('/job-detail/')[1]
+                    self.logger.debug(f"Found job ID from URL: {job_id}")
                     return job_id
             except NoSuchElementException:
                 pass
                 
-            # Method 3: Old UI selectors (fallback)
+            # Method 4: Old UI selectors (fallback)
             try:
                 title_link = card.find_element(By.CSS_SELECTOR, "[data-cy='card-title-link'], a.job-title, h2 a, h3 a")
                 job_url = title_link.get_attribute('href')
                 if job_url and '/jobs/' in job_url:
                     job_id = job_url.split('/jobs/')[1].split('/')[0]
+                    self.logger.debug(f"Found job ID from fallback URL: {job_id}")
                     return job_id
             except NoSuchElementException:
                 pass
             
-            # Method 4: Create a hash from the card text as fallback
+            # Method 5: Create a hash from the card text as last resort
             card_text = card.text
-            return hashlib.md5(card_text.encode()).hexdigest()
+            job_id = hashlib.md5(card_text.encode()).hexdigest()
+            self.logger.debug(f"Generated hash-based job ID: {job_id}")
+            return job_id
             
         except Exception as e:
             self.logger.warning(f"Could not extract job ID from card: {str(e)}")
             return None
-
+    
     def check_easy_apply_available(self, card) -> bool:
         """Check if Easy Apply is available with improved detection for new UI"""
         max_retries = MAX_RETRIES.get('status_check', 3)
         
         for attempt in range(max_retries):
             try:
-                self.logger.info(f"Checking for Easy Apply (attempt {attempt+1}/{max_retries})")
+                self.logger.debug(f"Checking for Easy Apply (attempt {attempt+1}/{max_retries})")
                 
-                # First delay to allow the page to fully update
+                # Allow the page to fully update
                 self.random_delay('status_check')
                 time.sleep(2) 
                 
-                # Method 1: Check for "Easy Apply" text in buttons (new UI)
+                # Method 1: Check for Easy Apply text with lightning bolt SVG (new UI)
                 try:
-                    # Look for Easy Apply text with lightning bolt icon
+                    # Look for the lightning bolt SVG path that indicates Easy Apply
+                    lightning_svg_path = 'M315.27 33 96 304h128l-31.51 173.23a2.36 2.36 0 0 0 2.33 2.77h0a2.36 2.36 0 0 0 1.89-.95L416 208H288l31.66-173.25a2.45 2.45 0 0 0-2.44-2.75h0a2.42 2.42 0 0 0-1.95 1z'
+                    
+                    lightning_elements = card.find_elements(
+                        By.XPATH,
+                        f".//svg//path[@d='{lightning_svg_path}']"
+                    )
+                    
+                    for lightning in lightning_elements:
+                        # Check if this SVG is part of an Easy Apply button
+                        parent_element = lightning
+                        for _ in range(5):  # Check up to 5 levels up
+                            parent_element = parent_element.find_element(By.XPATH, "..")
+                            if parent_element.tag_name in ['a', 'button']:
+                                parent_text = parent_element.text.lower()
+                                if 'easy apply' in parent_text and parent_element.is_displayed():
+                                    self.logger.info("Found Easy Apply via lightning bolt SVG")
+                                    return True
+                                break
+                except Exception as e:
+                    self.logger.debug(f"Lightning SVG check failed: {e}")
+                
+                # Method 2: Look for "Easy Apply" text in buttons/links (new UI)
+                try:
                     easy_apply_elements = card.find_elements(
                         By.XPATH, 
-                        ".//span[contains(text(), 'Easy Apply')]"
+                        ".//a[contains(text(), 'Easy Apply')] | .//button[contains(text(), 'Easy Apply')] | .//span[contains(text(), 'Easy Apply')]"
                     )
-                    if easy_apply_elements and any(elem.is_displayed() for elem in easy_apply_elements):
-                        self.logger.info("Found Easy Apply text")
-                        return True
                     
-                    # Look for the lightning bolt icon that indicates Easy Apply
-                    lightning_icons = card.find_elements(
-                        By.XPATH,
-                        ".//svg[contains(@viewBox, '0 0 512 512')]//path[contains(@d, 'M315.27 33 96 304h128')]"
-                    )
-                    if lightning_icons and any(icon.is_displayed() for icon in lightning_icons):
-                        self.logger.info("Found Easy Apply lightning icon")
-                        return True
-                except:
-                    pass
+                    for elem in easy_apply_elements:
+                        # Check if the element or its parent is clickable and visible
+                        clickable_parent = elem
+                        for _ in range(3):  # Check element and up to 2 levels up
+                            if clickable_parent.tag_name in ['a', 'button'] and clickable_parent.is_displayed():
+                                self.logger.info("Found Easy Apply text element")
+                                return True
+                            try:
+                                clickable_parent = clickable_parent.find_element(By.XPATH, "..")
+                            except:
+                                break
+                except Exception as e:
+                    self.logger.debug(f"Easy Apply text check failed: {e}")
                 
-                # Method 2: Look for "Easy Apply" box in the new UI design
+                # Method 3: Look for Easy Apply indicator box (mobile/small screens)
                 try:
                     easy_apply_box = card.find_elements(By.CSS_SELECTOR, 
-                        "div.box[aria-labelledby='easyApply-label']")
-                    if easy_apply_box and any(box.is_displayed() for box in easy_apply_box):
-                        self.logger.info("Found Easy Apply box")
-                        return True
-                except:
-                    pass
+                        "div.box[aria-labelledby='easyApply-label'], p[id='easyApply-label']")
+                        
+                    for box in easy_apply_box:
+                        if box.is_displayed() and 'easy apply' in box.text.lower():
+                            self.logger.info("Found Easy Apply indicator box")
+                            return True
+                except Exception as e:
+                    self.logger.debug(f"Easy Apply box check failed: {e}")
                     
-                # Method 3: Old UI selectors (fallback)
-                for indicator in [
+                # Method 4: Old UI selectors (fallback)
+                old_selectors = [
                     "[data-cy='easyApplyBtn']",
                     ".easy-apply-button",
                     ".easy-apply",
                     "button[class*='easyApply']",
                     "button[class*='easy-apply']"
-                ]:
-                    elements = card.find_elements(By.CSS_SELECTOR, indicator)
-                    for element in elements:
-                        if element.is_displayed():
-                            self.logger.info(f"Found Easy Apply indicator: {indicator}")
-                            return True
+                ]
                 
-                # If this is not the last attempt, wait longer before retry
+                for selector in old_selectors:
+                    try:
+                        elements = card.find_elements(By.CSS_SELECTOR, selector)
+                        for element in elements:
+                            if element.is_displayed():
+                                self.logger.info(f"Found Easy Apply with fallback selector: {selector}")
+                                return True
+                    except:
+                        continue
+                
+                # If this is not the last attempt, wait before retry
                 if attempt < max_retries - 1:
-                    self.logger.info(f"Easy Apply not found, waiting before retry {attempt+1}")
+                    self.logger.debug(f"Easy Apply not found, waiting before retry {attempt+1}")
                     time.sleep(2 * (attempt + 1))  # Progressive delay
                 
             except Exception as e:
@@ -287,16 +328,16 @@ class DiceBot:
         
         self.logger.info("Easy Apply not available after all attempts")
         return False
-    
+
     def is_already_applied(self, card) -> bool:
         """Enhanced method to check if already applied to a job with new UI selectors"""
         max_retries = MAX_RETRIES.get('status_check', 3)
         
         try:
-            # Get job ID first
+            # Get job ID first and check our tracker
             job_id = self.get_job_id_from_card(card)
             
-            # First check our own tracker
+            # Check our own tracker first
             if job_id and self.tracker.is_job_applied(job_id):
                 self.logger.info(f"Found job ID {job_id} in tracker as already applied")
                 return True
@@ -311,19 +352,61 @@ class DiceBot:
         # Proceed with UI checks with retries
         for attempt in range(max_retries):
             try:
-                self.logger.info(f"Checking if already applied (attempt {attempt+1}/{max_retries})")
+                self.logger.debug(f"Checking if already applied (attempt {attempt+1}/{max_retries})")
                 
                 # Add delay to allow the page to update its status
                 self.random_delay('status_check')
                 
-                # Method 1: Look for "Applied" text in the card
+                # Method 1: Look for "Applied" text with checkmark SVG (new UI)
+                try:
+                    # Look for the checkmark SVG path that indicates Applied status
+                    checkmark_svg_paths = [
+                        'M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192z',  # Circle
+                        'M352 176 217.6 336 160 272'  # Checkmark
+                    ]
+                    
+                    for svg_path in checkmark_svg_paths:
+                        checkmark_elements = card.find_elements(
+                            By.XPATH,
+                            f".//svg//path[@d='{svg_path}']"
+                        )
+                        
+                        for checkmark in checkmark_elements:
+                            # Check if this SVG is part of an Applied button
+                            parent_element = checkmark
+                            for _ in range(5):  # Check up to 5 levels up
+                                parent_element = parent_element.find_element(By.XPATH, "..")
+                                if parent_element.tag_name in ['a', 'button']:
+                                    parent_text = parent_element.text.lower()
+                                    if 'applied' in parent_text and parent_element.is_displayed():
+                                        self.logger.info("Found Applied status via checkmark SVG")
+                                        return True
+                                    break
+                except Exception as e:
+                    self.logger.debug(f"Checkmark SVG check failed: {e}")
+                
+                # Method 2: Look for "Applied" text in the card
                 card_text = card.text.lower()
                 applied_indicators = ["applied", "application submitted", "app submitted"]
                 if any(indicator in card_text for indicator in applied_indicators):
                     self.logger.info(f"Found applied text in card")
                     return True
                 
-                # Method 2: Check for any CSS classes that might indicate applied status
+                # Method 3: Look for Applied text in buttons/links
+                try:
+                    applied_elements = card.find_elements(
+                        By.XPATH, 
+                        ".//a[contains(text(), 'Applied')] | .//button[contains(text(), 'Applied')] | .//span[contains(text(), 'Applied')]"
+                    )
+                    
+                    for elem in applied_elements:
+                        if elem.is_displayed():
+                            self.logger.info("Found Applied text element")
+                            return True
+                except Exception as e:
+                    self.logger.debug(f"Applied text check failed: {e}")
+                
+                # Method 4: Check for any CSS classes that might indicate applied status
                 try:
                     applied_elements = card.find_elements(
                         By.XPATH, 
@@ -335,7 +418,7 @@ class DiceBot:
                 except:
                     pass
                 
-                # Method 3: Old UI indicators (fallback)
+                # Method 5: Old UI indicators (fallback)
                 applied_indicators = [
                     ".ribbon-status-applied",
                     ".search-status-ribbon-mobile.ribbon-status-applied",
@@ -348,9 +431,9 @@ class DiceBot:
                         self.logger.info(f"Found applied indicator: {indicator}")
                         return True
                 
-                # If this is not the last attempt, wait longer before retry
+                # If this is not the last attempt, wait before retry
                 if attempt < max_retries - 1:
-                    self.logger.info(f"Applied status not found, waiting before retry {attempt+1}")
+                    self.logger.debug(f"Applied status not found, waiting before retry {attempt+1}")
                     time.sleep(2 * (attempt + 1))  # Progressive delay
                     
             except Exception as e:
@@ -358,11 +441,121 @@ class DiceBot:
                 if attempt < max_retries - 1:
                     time.sleep(2)  # Wait before retry
         
-        self.logger.info("No applied status found after all attempts")
+        self.logger.debug("No applied status found after all attempts")
         return False
-    
+
+    def _verify_easy_apply_on_details_page(self) -> bool:
+        """
+        Verify that Easy Apply is actually available on the job details page by checking 
+        the shadow DOM content of apply-button-wc element
+        """
+        try:
+            # Give the page a moment to fully load the shadow DOM content
+            time.sleep(3)
+            
+            # Look for the apply-button-wc element
+            apply_button_wc = self.driver.find_element(By.CSS_SELECTOR, "apply-button-wc")
+            
+            if not apply_button_wc:
+                self.logger.warning("apply-button-wc element not found on job details page")
+                return False
+            
+            # Check the shadow DOM content to determine the actual status
+            shadow_content_check = self.driver.execute_script("""
+                const applyButtonWc = arguments[0];
+                if (!applyButtonWc.shadowRoot) {
+                    return {status: 'no_shadow_root', content: ''};
+                }
+                
+                // Check for application-submitted element (already applied)
+                const applicationSubmitted = applyButtonWc.shadowRoot.querySelector('application-submitted');
+                if (applicationSubmitted) {
+                    const submittedText = applicationSubmitted.textContent || '';
+                    return {
+                        status: 'already_applied', 
+                        content: submittedText,
+                        element: 'application-submitted'
+                    };
+                }
+                
+                // Check for apply-button element (can still apply)
+                const applyButton = applyButtonWc.shadowRoot.querySelector('apply-button');
+                if (applyButton) {
+                    const buttonText = applyButton.textContent || '';
+                    return {
+                        status: 'can_apply', 
+                        content: buttonText,
+                        element: 'apply-button'
+                    };
+                }
+                
+                // Check for any button with "Easy Apply" text
+                const easyApplyBtn = applyButtonWc.shadowRoot.querySelector('button.btn-primary');
+                if (easyApplyBtn && easyApplyBtn.textContent.includes('Easy apply')) {
+                    return {
+                        status: 'can_apply', 
+                        content: easyApplyBtn.textContent,
+                        element: 'button.btn-primary'
+                    };
+                }
+                
+                // Get all content for debugging
+                const allContent = applyButtonWc.shadowRoot.innerHTML;
+                return {
+                    status: 'unknown', 
+                    content: allContent,
+                    element: 'unknown'
+                };
+            """, apply_button_wc)
+            
+            self.logger.debug(f"Shadow DOM check result: {shadow_content_check}")
+            
+            status = shadow_content_check.get('status', 'unknown')
+            content = shadow_content_check.get('content', '')
+            element = shadow_content_check.get('element', '')
+            
+            if status == 'already_applied':
+                self.logger.info(f"Job already applied - found 'application-submitted' in shadow DOM: {content}")
+                return False
+            elif status == 'can_apply':
+                self.logger.info(f"Easy Apply available - found '{element}' in shadow DOM: {content}")
+                return True
+            elif status == 'no_shadow_root':
+                self.logger.warning("No shadow root found in apply-button-wc element")
+                return False
+            else:
+                self.logger.warning(f"Unknown shadow DOM content: {content}")
+                # Try to determine from content
+                if any(phrase in content.lower() for phrase in ['application submitted', 'already applied', 'applied']):
+                    self.logger.info("Detected already applied from shadow DOM content")
+                    return False
+                elif any(phrase in content.lower() for phrase in ['easy apply', 'apply']):
+                    self.logger.info("Detected Easy Apply available from shadow DOM content")
+                    return True
+                else:
+                    self.logger.warning("Could not determine application status from shadow DOM")
+                    return False
+                    
+        except NoSuchElementException:
+            self.logger.warning("apply-button-wc element not found on job details page")
+            return False
+        except Exception as e:
+            self.logger.error(f"Error verifying Easy Apply on details page: {str(e)}")
+            return False
+
+    def _extract_job_id_from_url(self) -> Optional[str]:
+        """Extract job ID from current URL"""
+        try:
+            current_url = self.driver.current_url
+            if '/job-detail/' in current_url:
+                return current_url.split('/job-detail/')[1].split('?')[0]
+            return None
+        except Exception as e:
+            self.logger.warning(f"Could not extract job ID from URL: {str(e)}")
+            return None
+
     def extract_job_details(self, card) -> Optional[Tuple[Dict, str]]:
-        """Extract job details from card and detailed view with updated selectors for new UI"""
+        """Extract job details from card and detailed view with early application status verification"""
         original_window = self.driver.current_window_handle
         
         try:
@@ -405,14 +598,16 @@ class DiceBot:
                     except:
                         continue
             
-            # Extract location (new UI)
+            # Extract location (new UI) - filter out dates
             try:
                 location_elems = card.find_elements(By.CSS_SELECTOR, "p.text-sm.font-normal.text-zinc-600")
                 if location_elems:
                     for loc_elem in location_elems:
-                        # Filter out date info
-                        if "ago" not in loc_elem.text.lower():
-                            job_details['location'] = loc_elem.text.strip()
+                        text = loc_elem.text.strip()
+                        # Filter out date information (contains "ago", "Yesterday", "Today", etc.)
+                        date_indicators = ["ago", "yesterday", "today", "•"]
+                        if not any(indicator in text.lower() for indicator in date_indicators) and len(text) > 2:
+                            job_details['location'] = text
                             break
             except NoSuchElementException:
                 # Fallback to old UI selectors
@@ -471,12 +666,38 @@ class DiceBot:
                 self.logger.error("Timeout waiting for new window")
                 return None
             
-            time.sleep(5)
-            
             # Wait for job details page to load
+            time.sleep(5)
             WebDriverWait(self.driver, 15).until(
                 lambda d: d.execute_script("return document.readyState") == "complete"
             )
+            
+            # *** CRITICAL NEW CHECK: Verify Easy Apply is still available on job details page ***
+            self.logger.info(f"Verifying Easy Apply availability on job details page for: {job_details['title']}")
+            
+            if not self._verify_easy_apply_on_details_page():
+                self.logger.warning(f"Job details page shows already applied or no Easy Apply available: {job_details['title']}")
+                
+                # Create basic job info for tracking
+                job_id = self._extract_job_id_from_url()
+                job_details['job_id'] = job_id or hashlib.md5(f"{job_details['title']}{job_details['company']}".encode()).hexdigest()
+                
+                # Record this as already applied
+                self.tracker.add_application(
+                    job_details, 'skipped', 
+                    notes="Already applied (discovered on job details page)"
+                )
+                
+                # Close detail window and return to search results
+                if len(self.driver.window_handles) > 1:
+                    self.driver.close()
+                    self.driver.switch_to.window(original_window)
+                
+                return None  # Don't proceed with full extraction
+            
+            self.logger.info(f"Easy Apply confirmed available on job details page: {job_details['title']}")
+            
+            # Now proceed with full job details extraction since we know we can apply
             
             # Extract skills (new UI)
             skills = []
@@ -484,7 +705,7 @@ class DiceBot:
             # Try new UI skills section first
             try:
                 skills_element = self.driver.find_element(By.CSS_SELECTOR, "[data-cy='skillsList'], [data-testid='skillsList']")
-                skill_items = skills_element.find_elements(By.CSS_SELECTOR, ".chip_chip__cYJs6 span, span, li")
+                skill_items = skills_element.find_elements(By.CSS_SELECTOR, ".chip_chip__cYJs6 span, span[id^='skillChip:'], li")
                 if skill_items:
                     skills = [skill.text.strip() for skill in skill_items if skill.text.strip()]
             except NoSuchElementException:
@@ -551,10 +772,8 @@ class DiceBot:
             
             # Extract or generate job ID
             if 'job_id' not in job_details or not job_details['job_id']:
-                job_url = self.driver.current_url
-                if '/job-detail/' in job_url:
-                    job_details['job_id'] = job_url.split('/job-detail/')[1]
-                else:
+                job_details['job_id'] = self._extract_job_id_from_url()
+                if not job_details['job_id']:
                     # Generate unique job ID
                     content = f"{job_details['title']}{job_details['company']}{job_details['description'][:100]}"
                     job_details['job_id'] = hashlib.md5(content.encode()).hexdigest()
@@ -575,7 +794,7 @@ class DiceBot:
                 self.driver.close()
                 self.driver.switch_to.window(original_window)
             return None
-
+    
     def click_easy_apply(self) -> bool:
         """Click the Easy Apply button with support for shadow DOM in new UI"""
         try:
@@ -1194,131 +1413,239 @@ class DiceBot:
             )
             return False
 
+    def debug_search_page(self):
+        """Debug helper to analyze what's on the search results page"""
+        try:
+            self.logger.info("=== DEBUG: Analyzing search results page ===")
+            
+            # Check for results container
+            containers = self.driver.find_elements(By.CSS_SELECTOR, "[data-testid='job-search-results-container']")
+            self.logger.info(f"Found {len(containers)} results containers")
+            
+            # Check for various job card selectors
+            selectors_to_check = [
+                "div[data-testid='job-search-serp-card']",
+                "div[data-id]",
+                "div[role='listitem']",
+                "[data-cy='search-card']"
+            ]
+            
+            for selector in selectors_to_check:
+                elements = self.driver.find_elements(By.CSS_SELECTOR, selector)
+                self.logger.info(f"Selector '{selector}': found {len(elements)} elements")
+                
+                if elements and len(elements) > 0:
+                    # Log details about first element
+                    first_elem = elements[0]
+                    try:
+                        self.logger.info(f"  First element text preview: {first_elem.text[:100]}...")
+                        self.logger.info(f"  First element data-id: {first_elem.get_attribute('data-id')}")
+                        self.logger.info(f"  First element data-testid: {first_elem.get_attribute('data-testid')}")
+                    except:
+                        pass
+            
+            # Check page title and URL
+            self.logger.info(f"Current URL: {self.driver.current_url}")
+            self.logger.info(f"Page title: {self.driver.title}")
+            
+            # Look for any error messages or "no results" indicators
+            no_results_selectors = [
+                "[data-cy='no-results']",
+                ".no-results",
+                "text*='No jobs found'",
+                "text*='0 results'"
+            ]
+            
+            for selector in no_results_selectors:
+                elements = self.driver.find_elements(By.CSS_SELECTOR, selector)
+                if elements:
+                    self.logger.warning(f"Found 'no results' indicator: {selector}")
+            
+            self.logger.info("=== END DEBUG ===")
+            
+        except Exception as e:
+            self.logger.error(f"Error in debug_search_page: {str(e)}")
+
     def process_search_results(self) -> int:
-        """Process all jobs on current page with updated selectors for new UI"""
+        """Process all jobs on current page with enhanced debugging for new UI"""
         new_jobs_found = 0
         try:
-            # Find all job cards (new UI)
-            job_cards = []
+            self.logger.info("Starting to process search results...")
             
-            # Try new UI selectors first
+            # Wait for the results container to load first
             try:
-                cards = WebDriverWait(self.driver, 10).until(
-                    EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div[data-id]"))
+                results_container = WebDriverWait(self.driver, 15).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid='job-search-results-container']"))
                 )
-                if cards and len(cards) > 0:
-                    job_cards = cards
-                    self.logger.info(f"Found {len(cards)} job cards with new UI selector: div[data-id]")
-            except:
-                # Fallback to old UI selectors
-                selectors = [
-                    "dhi-search-card[data-cy='search-card']",
-                    ".search-card",
-                    ".job-card"
-                ]
-                
-                for selector in selectors:
-                    try:
-                        cards = WebDriverWait(self.driver, 10).until(
-                            EC.presence_of_all_elements_located((By.CSS_SELECTOR, selector))
-                        )
-                        if cards and len(cards) > 0:
-                            job_cards = cards
-                            self.logger.info(f"Found {len(cards)} job cards with selector: {selector}")
-                            break
-                    except:
-                        continue
-            
-            if not job_cards:
-                self.logger.error("No job cards found on current page")
+                self.logger.info("Found job search results container")
+            except TimeoutException:
+                self.logger.error("Could not find job search results container")
                 return new_jobs_found
             
-            for card in job_cards:
-                self.jobs_processed += 1
-                self.tracker.increment_jobs_found()
-                new_jobs_found += 1
-                
-                # Scroll to the card to ensure it's in view
-                self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", card)
-                
-                # Allow the page some time to update statuses after scrolling
-                time.sleep(3)
-                
-                # First check if already applied - using the improved function with retries and delays
-                if self.is_already_applied(card):
-                    self.logger.info("Skipping already applied job")
-                    self.jobs_skipped += 1
+            # Wait a bit more for dynamic content to load
+            time.sleep(3)
+            
+            # Try multiple selectors in order of preference
+            job_cards = []
+            selectors_to_try = [
+                # New UI - most specific
+                "div[data-testid='job-search-serp-card'][data-id]",
+                # New UI - less specific
+                "div[data-testid='job-search-serp-card']",
+                # New UI - by role
+                "div[role='listitem'] div[data-testid='job-search-serp-card']",
+                # New UI - by data-id only
+                "div[data-id]",
+                # Old UI fallbacks
+                "dhi-search-card[data-cy='search-card']",
+                ".search-card",
+                ".job-card"
+            ]
+            
+            for selector in selectors_to_try:
+                try:
+                    self.logger.info(f"Trying selector: {selector}")
+                    cards = self.driver.find_elements(By.CSS_SELECTOR, selector)
+                    
+                    if cards and len(cards) > 0:
+                        # Filter out any cards that might not be actual job cards
+                        valid_cards = []
+                        for card in cards:
+                            try:
+                                # Check if card has job-related content
+                                card_text = card.text.strip()
+                                if len(card_text) > 50:  # Job cards should have substantial content
+                                    valid_cards.append(card)
+                            except:
+                                continue
+                        
+                        if valid_cards:
+                            job_cards = valid_cards
+                            self.logger.info(f"Found {len(job_cards)} valid job cards with selector: {selector}")
+                            break
+                    else:
+                        self.logger.debug(f"No cards found with selector: {selector}")
+                        
+                except Exception as e:
+                    self.logger.debug(f"Selector {selector} failed: {str(e)}")
                     continue
-                
-                # Then check if Easy Apply is available - using the improved function with retries and delays
-                if not self.check_easy_apply_available(card):
-                    self.logger.info("Skipping job without Easy Apply")
+            
+            if not job_cards:
+                self.logger.error("No job cards found with any selector")
+                # Debug: Save page source for analysis
+                try:
+                    debug_dir = Path('debug')
+                    debug_dir.mkdir(exist_ok=True)
+                    with open(debug_dir / f'no_cards_found_{datetime.now():%Y%m%d_%H%M%S}.html', 'w', encoding='utf-8') as f:
+                        f.write(self.driver.page_source)
+                    self.logger.info("Saved page source to debug directory for analysis")
+                except:
+                    pass
+                return new_jobs_found
+            
+            self.logger.info(f"Processing {len(job_cards)} job cards...")
+            
+            for i, card in enumerate(job_cards):
+                try:
+                    self.logger.info(f"Processing job card {i+1}/{len(job_cards)}")
                     
-                    # Record this skip with basic info
-                    job_id = self.get_job_id_from_card(card)
-                    title = "Unknown"
-                    company = "Unknown"
+                    self.jobs_processed += 1
+                    self.tracker.increment_jobs_found()
+                    new_jobs_found += 1
                     
-                    # Try to extract title (new UI)
+                    # Scroll to the card to ensure it's in view
+                    self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", card)
+                    
+                    # Allow the page some time to update statuses after scrolling
+                    time.sleep(3)
+                    
+                    # Get basic job info for logging
+                    job_title = "Unknown"
                     try:
                         title_elem = card.find_element(By.CSS_SELECTOR, "a[data-testid='job-search-job-detail-link']")
-                        title = title_elem.text
+                        job_title = title_elem.text.strip()
                     except:
-                        # Try old UI selector
                         try:
                             title_elem = card.find_element(By.CSS_SELECTOR, "[data-cy='card-title-link']")
-                            title = title_elem.text
+                            job_title = title_elem.text.strip()
                         except:
                             pass
                     
-                    # Try to extract company (new UI)
-                    try:
-                        company_elem = card.find_element(By.CSS_SELECTOR, "a[data-rac][href*='company-profile']")
-                        company = company_elem.text
-                    except:
-                        # Try old UI selector
+                    self.logger.info(f"Processing job: {job_title}")
+                    
+                    # Check if already applied first
+                    if self.is_already_applied(card):
+                        self.logger.info(f"Skipping already applied job: {job_title}")
+                        self.jobs_skipped += 1
+                        continue
+                    
+                    # Then check if Easy Apply is available
+                    if not self.check_easy_apply_available(card):
+                        self.logger.info(f"Skipping job without Easy Apply: {job_title}")
+                        
+                        # Record this skip with basic info
+                        job_id = self.get_job_id_from_card(card)
+                        company = "Unknown"
+                        
+                        # Try to extract company
                         try:
-                            company_elem = card.find_element(By.CSS_SELECTOR, "[data-cy='search-result-company-name']")
-                            company = company_elem.text
+                            company_elem = card.find_element(By.CSS_SELECTOR, "a[data-rac][href*='company-profile']")
+                            company = company_elem.text.strip()
                         except:
-                            pass
+                            try:
+                                company_elem = card.find_element(By.CSS_SELECTOR, "[data-cy='search-result-company-name']")
+                                company = company_elem.text.strip()
+                            except:
+                                pass
+                        
+                        job_info = {
+                            'job_id': job_id or f"unknown_{self.jobs_processed}",
+                            'title': job_title,
+                            'company': company
+                        }
+                        
+                        self.tracker.add_application(
+                            job_info, 'skipped', notes="No Easy Apply available"
+                        )
+                        
+                        self.jobs_skipped += 1
+                        continue
                     
-                    job_info = {
-                        'job_id': job_id or f"unknown_{self.jobs_processed}",
-                        'title': title,
-                        'company': company
-                    }
+                    # Process job with Easy Apply
+                    self.logger.info(f"Found Easy Apply job, extracting details: {job_title}")
+                    result = self.extract_job_details(card)
+                    if not result:
+                        self.logger.warning(f"Failed to extract job details for: {job_title}")
+                        self.jobs_skipped += 1
+                        continue
+                        
+                    job_details, original_window = result
                     
-                    self.tracker.add_application(
-                        job_info, 'skipped', notes="No Easy Apply available"
-                    )
+                    # Submit application
+                    self.logger.info(f"Submitting application for: {job_details['title']}")
+                    application_result = self.submit_application(job_details)
                     
-                    self.jobs_skipped += 1
+                    if application_result:
+                        self.logger.info(f"Successfully applied to {job_details['title']}")
+                    else:
+                        self.logger.warning(f"Failed to apply to {job_details['title']}")
+                    
+                    # Close detail window and return to search results
+                    if len(self.driver.window_handles) > 1:
+                        self.driver.close()
+                        self.driver.switch_to.window(original_window)
+                        
+                    self.random_delay('between_applications')
+                    
+                except Exception as e:
+                    self.logger.error(f"Error processing job card {i+1}: {str(e)}")
+                    # Try to get back to the search window if we're in a detail window
+                    if len(self.driver.window_handles) > 1:
+                        self.driver.close()
+                        self.driver.switch_to.window(self.driver.window_handles[0])
                     continue
-                
-                # Process job with Easy Apply
-                result = self.extract_job_details(card)
-                if not result:
-                    self.jobs_skipped += 1
-                    continue
-                    
-                job_details, original_window = result
-                
-                # Submit application
-                application_result = self.submit_application(job_details)
-                
-                if application_result:
-                    self.logger.info(f"Successfully applied to {job_details['title']}")
-                else:
-                    self.logger.warning(f"Failed to apply to {job_details['title']}")
-                
-                # Close detail window and return to search results
-                if len(self.driver.window_handles) > 1:
-                    self.driver.close()
-                    self.driver.switch_to.window(original_window)
-                    
-                self.random_delay('between_applications')
             
+            self.logger.info(f"Completed processing {len(job_cards)} job cards. Found {new_jobs_found} new jobs.")
             return new_jobs_found
                 
         except Exception as e:
@@ -1328,7 +1655,7 @@ class DiceBot:
                 self.driver.close()
                 self.driver.switch_to.window(self.driver.window_handles[0])
             return new_jobs_found
-        
+
     def next_page_exists(self) -> bool:
         """Check if next page exists with updated selectors for new UI"""
         try:
@@ -1394,16 +1721,21 @@ class DiceBot:
             return False
 
     def search_jobs(self, title: str) -> bool:
-        """Search for jobs with given title"""
+        """Search for jobs with given title and enhanced debugging"""
         try:
             search_url = DICE_SEARCH_URL.format(quote(title))
+            self.logger.info(f"Navigating to search URL: {search_url}")
             self.driver.get(search_url)
             self.random_delay('page_load')
+            
+            # Wait longer for the new UI to load completely
+            time.sleep(5)
             
             # Verify search results loaded (new UI)
             results_selectors = [
                 # New UI selectors
                 "div[data-testid='jobSearchResultsContainer']",
+                "div[data-testid='job-search-results-container']",
                 "div.max-w-[1400px]",
                 
                 # Old UI selectors
@@ -1412,6 +1744,7 @@ class DiceBot:
                 ".search-results"
             ]
             
+            results_found = False
             for selector in results_selectors:
                 try:
                     results = WebDriverWait(self.driver, 15).until(
@@ -1419,16 +1752,25 @@ class DiceBot:
                     )
                     if results:
                         self.logger.info(f"Search results loaded with selector: {selector}")
-                        return True
+                        results_found = True
+                        break
                 except:
                     continue
             
-            return False
+            if not results_found:
+                self.logger.error("Could not verify search results loaded")
+                return False
             
+            # Add debug analysis
+            if DEBUG_MODE:
+                self.debug_search_page()
+            
+            return True
+                
         except Exception as e:
             self.logger.error(f"Error searching jobs: {str(e)}")
             return False
-
+    
     def generate_summary_report(self):
         """Generate and print summary of the session"""
         report = self.tracker.generate_report()
