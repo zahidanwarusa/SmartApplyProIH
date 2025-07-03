@@ -1901,7 +1901,7 @@ class DiceBot:
             random.shuffle(available_titles)
             
             # Process all titles with cycling instead of exhausting one at a time
-            max_pages_per_title = 3  # Limit pages per title before cycling
+            max_pages_per_title = 50  # Limit pages per title before cycling
             
             # Track API check frequency
             last_api_check_time = time.time()

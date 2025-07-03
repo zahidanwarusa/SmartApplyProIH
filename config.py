@@ -80,15 +80,61 @@ JOB_TITLES = [
   "QA Automation",
   "Test Automation",
   "Senior SDET",
-  "Lead SDET"
+  "Lead SDET",
+  "Quality Assurance Engineer",
+  "QA Engineer", 
+  "Test Engineer",
+  "Software Test Engineer",
+  "Principal SDET",
+  "Staff SDET",
+  "Test Architect",
+  "Automation Architect",
+  "Performance Test Engineer",
+  "API Test Engineer",
+  "Mobile Test Engineer",
+  "Automation Developer",
+  "QA Developer",
+  "Test Developer",
+  "DevOps Engineer",
+  "Automation Engineer",
+  "Quality Engineer",
+  "Software Quality Engineer",
+  "Test Automation Developer",
+  "Senior QA Engineer",
+  "Lead QA Engineer",
+  "Principal QA Engineer",
+  "QA Analyst",
+  "Test Analyst",
+  "Automation Specialist",
+  "Test Automation Specialist",
+  "QA Specialist",
+  "Testing Engineer",
+  "Software Testing Engineer",
+  "Selenium Automation Engineer",
+  "Cypress Automation Engineer",
+  "UI Automation Engineer",
+  "Web Automation Engineer",
+  "Backend Test Engineer",
+  "Frontend Test Engineer",
+  "Full Stack Test Engineer",
+  "Security Test Engineer",
+  "Load Test Engineer",
+  "Integration Test Engineer",
+  "End to End Test Engineer",
+  "Healthcare QA Engineer",
+  "Medical Device Test Engineer",
+  "Healthcare Automation Engineer",
+  "HIPAA Compliance Test Engineer",
+  "Clinical Software Test Engineer",
+  "EMR Test Engineer",
+  "Healthcare Software Quality Engineer"
 ]
-
 # Search URL template
 DICE_SEARCH_URL = "https://www.dice.com/jobs?q={}&countryCode=US&pageSize=20&filters.workplaceTypes=Remote&filters.easyApply=true&language=en"
 
 # Application Limits
 MAX_APPLICATIONS_PER_DAY = 2
-MAX_PAGES_PER_TITLE = 3  # How many pages to process before moving to next title
+MAX_PAGES_PER_TITLE = 50  # How many pages to process before moving to next title
 
 # Debug Mode - Set to True for additional debugging information
 DEBUG_MODE = False
@@ -97,3 +143,58 @@ DEBUG_MODE = False
 RANDOMIZE_TITLES = True  # Process job titles in random order
 CYCLE_THROUGH_TITLES = True  # Cycle through all titles rather than exhausting one
 VERIFY_APPLIED_JOBS = True  # Double-check if a job was already applied to
+
+
+# ZipRecruiter Settings
+ZIPRECRUITER_EMAIL = "zahidsdet@gmail.com"
+ZIPRECRUITER_LOGIN_URL = "https://www.ziprecruiter.com/authn/login"
+ZIPRECRUITER_SEARCH_URL = "https://www.ziprecruiter.com/jobs-search?search={}&location=Remote+%28USA%29&refine_by_location_type=&radius=5000&days=&page={}"
+
+# ZipRecruiter Job Search Settings
+ZIPRECRUITER_JOB_TITLES = [
+    "SDET",
+    "Software Development Engineer in Test",
+    "QA Automation Engineer",
+    "Test Automation Engineer",
+    "Senior SDET",
+    "Lead SDET",
+    "Quality Assurance Automation",
+    "Software Test Engineer",
+    "Automation Test Engineer",
+    "Senior QA Engineer"
+]
+
+# Gmail API Settings for verification codes
+GMAIL_CREDENTIALS_FILE = "credentials/gmail_credentials.json"
+GMAIL_TOKEN_FILE = "credentials/gmail_token.json"
+
+# ZipRecruiter Delays (more conservative than Dice)
+ZIPRECRUITER_DELAYS = {
+    'page_load': (5, 10),
+    'between_actions': (3, 6),
+    'between_applications': (10, 20),
+    'between_pages': (8, 15),
+    'email_check': (10, 15),  # Time between email checks
+    'verification_wait': (5, 10)  # Wait after entering verification code
+}
+
+# ZipRecruiter Limits
+ZIPRECRUITER_MAX_APPLICATIONS_PER_DAY = 20
+ZIPRECRUITER_MAX_PAGES_PER_TITLE = 5
+ZIPRECRUITER_EMAIL_TIMEOUT = 300  # 5 minutes to wait for verification email
+
+# ZipRecruiter Selectors (will be updated as we discover them)
+ZIPRECRUITER_SELECTORS = {
+    'email_input': 'input[type="email"]',
+    'continue_button': 'button[type="submit"]',
+    'otp_inputs': 'textarea[id^="otp-"]',
+    'verify_button': 'button[type="submit"]',
+    'job_cards': '[data-testid="job-card"]',
+    'easy_apply_button': '[data-testid="easy-apply-button"]',
+    'already_applied': '.already-applied',
+    'next_page': '.pagination-next'
+}
+
+# Combined settings for main.py
+SUPPORTED_PLATFORMS = ['dice', 'ziprecruiter']
+DEFAULT_PLATFORM = 'dice'
