@@ -1,0 +1,12 @@
+Role: SDET - Kotlin
+Implementation Partner: Altimetrik
+Client:  Sofi
+Job Type: Full-time(Remote)
+
+Job Description:
+Design and implement automated functional test suites using Kotlin.
+Develop and maintain performance/load testing frameworks and tools (e.g., Gatling, JMeter, k6, or similar).
+Conduct load, stress, scalability, soak, and spike tests to evaluate application behavior under various scenarios.
+Collaborate with development teams to integrate test automation into CI/CD pipelines.
+Analyze test results and provide detailed reports with bottleneck identification and tuning suggestions.
+should be able to understand the domain of our system and write acceptance tests, and having experience setting up performance tests is a plus

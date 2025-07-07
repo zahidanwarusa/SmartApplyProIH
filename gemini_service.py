@@ -5,23 +5,105 @@ import re
 import time
 from pathlib import Path
 import google.generativeai as genai
-from config import GEMINI_API_KEY
+from config import GEMINI_API_KEYS, DATA_DIR, API_DAILY_LIMIT, API_WARNING_THRESHOLD
+from api_key_manager import APIKeyManager
 
 class GeminiService:
-    """Handles all interactions with Gemini AI with robust response handling"""
+    """Handles all interactions with Gemini AI with robust response handling and API key rotation"""
     
     def __init__(self):
-        self.setup_gemini()
+        # Initialize logger first
         self.logger = logging.getLogger(__name__)
         
         # Create debug directory for response analysis
         self.debug_dir = Path('debug')
         self.debug_dir.mkdir(exist_ok=True)
         
+        # Initialize the API key manager
+        self.api_key_manager = APIKeyManager(
+            GEMINI_API_KEYS, 
+            DATA_DIR, 
+            daily_limit=API_DAILY_LIMIT, 
+            warning_threshold=API_WARNING_THRESHOLD
+        )
+        
+        # Setup Gemini (now the logger is available)
+        self.setup_gemini()
+        
     def setup_gemini(self):
-        """Initialize Gemini AI"""
-        genai.configure(api_key=GEMINI_API_KEY)
-        self.model = genai.GenerativeModel("gemini-1.5-flash")
+        """Initialize Gemini AI with current API key"""
+        current_key = self.api_key_manager.get_current_key()
+        genai.configure(api_key=current_key)
+        self.model = genai.GenerativeModel("gemini-2.5-flash-lite-preview-06-17")
+        self.logger.info("Configured Gemini with current API key")
+
+    def _handle_api_error(self, error):
+        """Handle API errors, particularly rate limit errors"""
+        error_str = str(error)
+        
+        # Check if this is a rate limit or quota exceeded error
+        rate_limit_patterns = [
+            "rate limit",
+            "quota exceeded",
+            "resource exhausted",
+            "limit exceeded",
+            "too many requests"
+        ]
+        
+        is_rate_limit = any(pattern in error_str.lower() for pattern in rate_limit_patterns)
+        
+        if is_rate_limit:
+            self.logger.warning(f"API rate limit reached: {error_str}")
+            
+            # Try to rotate to next key
+            if self.api_key_manager.increment_usage():
+                self.setup_gemini()  # Reconfigure with new key
+                return True  # Key rotation successful
+            else:
+                self.logger.error("All API keys have reached their daily limit")
+                return False  # All keys exhausted
+        
+        # Some other API error
+        self.logger.error(f"API error (not rate-limit related): {error_str}")
+        return None  # Not a rate limit error
+
+    def make_api_call(self, prompt, max_retries=2, **kwargs):
+        """Make an API call with retry logic for rate limits"""
+        retry_count = 0
+        
+        while retry_count <= max_retries:
+            try:
+                # Increment usage counter before making the call
+                if not self.api_key_manager.increment_usage():
+                    self.logger.error("All API keys have reached their daily limit")
+                    return None
+                
+                response = self.model.generate_content(prompt, **kwargs)
+                return response
+                
+            except Exception as e:
+                result = self._handle_api_error(e)
+                
+                if result is True:
+                    # Rate limit error, but successfully rotated to new key
+                    retry_count += 1
+                    self.logger.info(f"Retrying with new API key (attempt {retry_count}/{max_retries})")
+                    time.sleep(1)  # Brief pause before retry
+                    continue
+                    
+                elif result is False:
+                    # All keys exhausted
+                    self.logger.error("All API keys exhausted, cannot proceed")
+                    return None
+                    
+                else:
+                    # Not a rate limit error - don't retry
+                    self.logger.error(f"API call failed: {str(e)}")
+                    return None
+                    
+        # Max retries reached
+        self.logger.error(f"Max retries ({max_retries}) reached for API call")
+        return None
 
     def optimize_resume_section(self, section_name: str, current_content, job_details: dict):
         """Main method to optimize a resume section based on job details"""
@@ -44,8 +126,8 @@ class GeminiService:
             with open(self.debug_dir / f"{section_name}_prompt.txt", 'w') as f:
                 f.write(prompt)
                 
-            # Get response from Gemini
-            response = self.model.generate_content(
+            # Get response from Gemini with API key rotation
+            response = self.make_api_call(
                 prompt,
                 generation_config=genai.GenerationConfig(
                     temperature=0.1,
@@ -666,8 +748,8 @@ class GeminiService:
                 with open(self.debug_dir / f"job_{i+1}_prompt.txt", 'w') as f:
                     f.write(prompt)
                 
-                # Get response from Gemini
-                response = self.model.generate_content(
+                # Get response from Gemini with API key rotation
+                response = self.make_api_call(
                     prompt,
                     generation_config=genai.GenerationConfig(
                         temperature=0.1,
@@ -995,7 +1077,7 @@ class GeminiService:
         return text
 
     def generate_cover_letter(self, job_details: dict, resume_path: str) -> str:
-        """Generate cover letter from job details and resume"""
+        """Generate cover letter from job details and resume with API key rotation"""
         try:
             # Load resume data from the JSON file
             try:
@@ -1052,7 +1134,8 @@ class GeminiService:
             with open(self.debug_dir / "cover_letter_prompt.txt", 'w') as f:
                 f.write(prompt)
 
-            response = self.model.generate_content(
+            # Use the API key rotation mechanism
+            response = self.make_api_call(
                 prompt,
                 generation_config=genai.GenerationConfig(
                     temperature=0.7,  # Higher temperature for more natural writing
@@ -1090,3 +1173,405 @@ class GeminiService:
         except Exception as e:
             self.logger.error(f"Error generating cover letter: {str(e)}")
             return ""
+    
+    def convert_job_description_to_json(self, description_text: str, job_title: str = "Software Engineer", 
+                                  company_name: str = "Unknown Company") -> dict:
+        """Convert a plain text job description to structured JSON format using Gemini AI
+        
+        Args:
+            description_text: The full job description text
+            job_title: The job title (default: "Software Engineer")
+            company_name: The company name (default: "Unknown Company")
+            
+        Returns:
+            Dict containing structured job information or None if conversion fails
+        """
+        try:
+            prompt = f"""
+            Convert the following job description into a structured JSON object.
+            
+            Job Title: {job_title}
+            Company: {company_name}
+            
+            Job Description:
+            {description_text}
+            
+            Extract the following information:
+            1. A clean job title (use the provided title if appropriate, otherwise extract from description)
+            2. Company name (use the provided company name)
+            3. Full job description (cleaned up and formatted)
+            4. A list of required skills mentioned in the description (be comprehensive)
+            5. Location information if mentioned
+            
+            Return ONLY a valid JSON object with the following structure:
+            {{
+            "title": "Extracted Job Title",
+            "company": "Company Name",
+            "location": "Location (if mentioned, otherwise 'Remote')",
+            "description": "Full job description",
+            "skills": ["Skill 1", "Skill 2", "Skill 3", ...]
+            }}
+            
+            IMPORTANT: 
+            - Return ONLY the JSON object with no other text before or after it
+            - Make sure the skills list is comprehensive and identifies specific technologies, tools, and competencies
+            - If location is not mentioned, use "Remote" as the default
+            - Do not include any markdown formatting or code blocks
+            """
+            
+            # Save the prompt for debugging
+            with open(self.debug_dir / "job_description_to_json_prompt.txt", 'w') as f:
+                f.write(prompt)
+            
+            # Make API call with key rotation
+            response = self.make_api_call(
+                prompt,
+                generation_config=genai.GenerationConfig(
+                    temperature=0.1,
+                    top_p=1,
+                    top_k=1,
+                    max_output_tokens=4000,
+                )
+            )
+            
+            if not response or not hasattr(response, 'text') or not response.text.strip():
+                self.logger.warning("No response received from Gemini for job description conversion")
+                return None
+            
+            # Save the raw response for debugging
+            with open(self.debug_dir / "job_description_to_json_response.txt", 'w') as f:
+                f.write(response.text)
+            
+            # Extract JSON from the response using our robust utility function
+            job_json = self._extract_json_from_text(response.text)
+            
+            if not job_json:
+                self.logger.error("Failed to extract JSON from Gemini response")
+                # Save the problematic response for debugging
+                with open(self.debug_dir / "failed_json_response.txt", 'w') as f:
+                    f.write(response.text)
+                
+                # Create a basic JSON with the job description text
+                self.logger.info("Creating basic JSON from job description text")
+                job_json = {
+                    'title': job_title,
+                    'company': company_name,
+                    'description': description_text,
+                    'location': 'Remote',
+                    'skills': []
+                }
+                
+                # Try to extract skills using regex patterns
+                skill_patterns = [
+                    r'(?:skills|requirements|qualifications):[^\n]*\n(.*?)(?:\n\n|\Z)',
+                    r'(?:experience|technical skills|expertise):[^\n]*\n(.*?)(?:\n\n|\Z)'
+                ]
+                
+                for pattern in skill_patterns:
+                    match = re.search(pattern, description_text, re.DOTALL | re.IGNORECASE)
+                    if match:
+                        skills_section = match.group(1)
+                        # Extract bullet points
+                        skills_items = re.findall(r'[-•*]\s*([^\n]*)', skills_section)
+                        if skills_items:
+                            job_json['skills'] = [item.strip() for item in skills_items]
+                            break
+                
+                # If no skills found, use common technical skills detection
+                if not job_json['skills']:
+                    common_tech_skills = [
+                        'Python', 'Java', 'JavaScript', 'TypeScript', 'C#', 'C++', 
+                        'SQL', 'AWS', 'Azure', 'GCP', 'Docker', 'Kubernetes', 
+                        'REST', 'API', 'Git', 'CI/CD', 'Jenkins', 'Selenium', 
+                        'Appium', 'JMeter', 'TestNG', 'JUnit', 'Maven', 'Gradle',
+                        'HTML', 'CSS', 'React', 'Angular', 'Vue', 'Node.js',
+                        'SDET', 'QA', 'Test Automation', 'Agile', 'Scrum'
+                    ]
+                    
+                    # Find skills in description
+                    for skill in common_tech_skills:
+                        if re.search(r'\b' + re.escape(skill) + r'\b', description_text, re.IGNORECASE):
+                            job_json['skills'].append(skill)
+                
+                # If still no skills, add default ones
+                if not job_json['skills']:
+                    job_json['skills'] = ["Test Automation", "Software Testing", "QA"]
+            
+            # Validate the JSON structure
+            required_fields = ['title', 'company', 'description', 'skills']
+            missing_fields = [field for field in required_fields if field not in job_json]
+            
+            if missing_fields:
+                self.logger.error(f"Missing required fields in job JSON: {missing_fields}")
+                
+                # Create a fallback JSON with the missing fields
+                if 'title' not in job_json:
+                    job_json['title'] = job_title
+                if 'company' not in job_json:
+                    job_json['company'] = company_name
+                if 'description' not in job_json:
+                    job_json['description'] = description_text
+                if 'skills' not in job_json:
+                    # Extract potential skills using a basic keyword approach
+                    common_tech_skills = [
+                        'Python', 'Java', 'JavaScript', 'TypeScript', 'C#', 'C++', 
+                        'SQL', 'AWS', 'Azure', 'GCP', 'Docker', 'Kubernetes', 
+                        'REST', 'API', 'Git', 'CI/CD', 'Jenkins', 'Selenium', 
+                        'Appium', 'JMeter', 'TestNG', 'JUnit', 'Maven', 'Gradle',
+                        'HTML', 'CSS', 'React', 'Angular', 'Vue', 'Node.js',
+                        'SDET', 'QA', 'Test Automation', 'Agile', 'Scrum',
+                        'JIRA', 'Confluence', 'DevOps', 'Linux', 'Unix',
+                        'Test Cases', 'Test Plan', 'Regression Testing',
+                        'Performance Testing', 'Security Testing', 'API Testing',
+                        'UI Testing', 'Unit Testing', 'HL7', 'FHIR', 'HIPAA'
+                    ]
+                    
+                    # Find skills in description
+                    found_skills = []
+                    for skill in common_tech_skills:
+                        if re.search(r'\b' + re.escape(skill) + r'\b', description_text, re.IGNORECASE):
+                            found_skills.append(skill)
+                    
+                    job_json['skills'] = found_skills if found_skills else ["Test Automation", "Software Testing"]
+                
+                self.logger.info("Created fallback JSON with missing fields")
+                # Save the fallback JSON for debugging
+                with open(self.debug_dir / "fallback_job_json.json", 'w') as f:
+                    json.dump(job_json, f, indent=2)
+            
+            # Ensure skills is a list
+            if 'skills' in job_json and not isinstance(job_json['skills'], list):
+                if isinstance(job_json['skills'], str):
+                    job_json['skills'] = [skill.strip() for skill in job_json['skills'].split(',')]
+                else:
+                    job_json['skills'] = []
+            
+            # Ensure location is set
+            if 'location' not in job_json or not job_json['location']:
+                job_json['location'] = 'Remote'
+            
+            # Save the processed JSON for debugging
+            with open(self.debug_dir / "job_description_to_json_processed.json", 'w') as f:
+                json.dump(job_json, f, indent=2)
+            
+            return job_json
+        
+        except Exception as e:
+            self.logger.error(f"Error converting job description to JSON: {str(e)}")
+            return None
+
+    def _extract_json_from_text(self, text: str) -> dict:
+        """Extract a JSON object from text using multiple approaches
+        
+        Args:
+            text: Text that might contain a JSON object
+            
+        Returns:
+            The extracted JSON as a dict or None if extraction fails
+        """
+        try:
+            # Save the original text for debugging
+            with open(self.debug_dir / "json_extraction_input.txt", 'w') as f:
+                f.write(text)
+                
+            # Method 1: Try direct parsing
+            try:
+                return json.loads(text)
+            except json.JSONDecodeError:
+                pass
+                
+            # Method 2: Find and extract JSON-like structure with curly braces
+            try:
+                matches = re.findall(r'({[^{]*})', text.replace('\n', ' '), re.DOTALL)
+                
+                if not matches:
+                    # Try more aggressive pattern
+                    matches = re.findall(r'({.*})', text, re.DOTALL)
+                    
+                # Try each match
+                for match in matches:
+                    try:
+                        # Clean up the match - remove code markers, fix quotes, etc.
+                        cleaned = match.strip()
+                        cleaned = re.sub(r'```(?:json)?|```', '', cleaned)
+                        cleaned = re.sub(r',\s*}', '}', cleaned)  # Remove trailing commas
+                        cleaned = re.sub(r',\s*]', ']', cleaned)  # Remove trailing commas in arrays
+                        
+                        # Try with original quotes
+                        try:
+                            return json.loads(cleaned)
+                        except json.JSONDecodeError:
+                            # Try replacing single quotes with double quotes
+                            cleaned = re.sub(r'\'', '"', cleaned)
+                            try:
+                                return json.loads(cleaned)
+                            except json.JSONDecodeError:
+                                continue
+                    except:
+                        continue
+            except:
+                pass
+                
+            # Method 3: Try to find JSON-like structure with "title", "company", etc. markers
+            markers = ['title', 'company', 'description', 'skills']
+            foundMarkers = []
+            markerStart = None
+            
+            # Find where the first marker appears
+            for marker in markers:
+                pattern = f'"{marker}"\\s*:'
+                match = re.search(pattern, text)
+                if match:
+                    foundMarkers.append(marker)
+                    start = match.start()
+                    if markerStart is None or start < markerStart:
+                        markerStart = start
+            
+            if markerStart is not None:
+                # Try to find opening brace before the first marker
+                text_before = text[:markerStart]
+                opening_brace = text_before.rfind('{')
+                
+                if opening_brace >= 0:
+                    # Find matching closing brace
+                    potential_json = text[opening_brace:]
+                    brace_count = 0
+                    closing_index = -1
+                    
+                    for i, char in enumerate(potential_json):
+                        if char == '{':
+                            brace_count += 1
+                        elif char == '}':
+                            brace_count -= 1
+                            if brace_count == 0:
+                                closing_index = i
+                                break
+                    
+                    if closing_index > 0:
+                        extracted = potential_json[:closing_index + 1]
+                        try:
+                            return json.loads(extracted)
+                        except json.JSONDecodeError:
+                            # Try to clean up and retry
+                            cleaned = re.sub(r',\s*}', '}', extracted)
+                            cleaned = re.sub(r',\s*]', ']', cleaned)
+                            try:
+                                return json.loads(cleaned)
+                            except json.JSONDecodeError:
+                                pass
+            
+            # Method 4: Manual JSON construction
+            # Look for patterns like "title": "Software Engineer"
+            result = {}
+            for marker in markers:
+                pattern = f'"{marker}"\\s*:\\s*"([^"]*)"'
+                match = re.search(pattern, text)
+                if match:
+                    result[marker] = match.group(1)
+                    
+            # Handle skills (could be an array)
+            skills_pattern = r'"skills"\s*:\s*\[(.*?)\]'
+            skills_match = re.search(skills_pattern, text, re.DOTALL)
+            if skills_match:
+                skills_text = skills_match.group(1)
+                # Extract items from array
+                skills = []
+                skill_matches = re.findall(r'"([^"]*)"', skills_text)
+                for skill in skill_matches:
+                    skills.append(skill)
+                if skills:
+                    result["skills"] = skills
+            
+            if len(result) >= 2:  # At least two fields found
+                return result
+                
+            # Method 5: Super aggressive extraction (last resort)
+            manual_json = {}
+            
+            # Try to find title
+            title_patterns = [
+                r'"title"\s*:\s*"([^"]*)"',
+                r'title:\s*"([^"]*)"',
+                r'title:\s*([^\n,]*)',
+                r'Job Title:?\s*([^\n]*)'
+            ]
+            
+            for pattern in title_patterns:
+                match = re.search(pattern, text, re.IGNORECASE)
+                if match:
+                    manual_json['title'] = match.group(1).strip()
+                    break
+                    
+            # Try to find company
+            company_patterns = [
+                r'"company"\s*:\s*"([^"]*)"',
+                r'company:\s*"([^"]*)"',
+                r'company:\s*([^\n,]*)',
+                r'Company:?\s*([^\n]*)'
+            ]
+            
+            for pattern in company_patterns:
+                match = re.search(pattern, text, re.IGNORECASE)
+                if match:
+                    manual_json['company'] = match.group(1).strip()
+                    break
+                    
+            # Extract description (take everything if necessary)
+            manual_json['description'] = text.strip()
+            
+            # Skills is trickier - look for skills section or keywords
+            manual_json['skills'] = []
+            skills_section = None
+            for pattern in [r'Skills:[^\n]*\n(.*?)(?:\n\n|\Z)', r'Requirements:[^\n]*\n(.*?)(?:\n\n|\Z)']:
+                match = re.search(pattern, text, re.DOTALL | re.IGNORECASE)
+                if match:
+                    skills_section = match.group(1)
+                    break
+                    
+            if skills_section:
+                # Extract bullet points or comma separated items
+                skills_items = re.findall(r'[-•*]\s*([^\n]*)', skills_section)
+                if skills_items:
+                    manual_json['skills'] = [item.strip() for item in skills_items]
+                else:
+                    # Try comma separated
+                    skills_items = skills_section.split(',')
+                    if len(skills_items) > 1:
+                        manual_json['skills'] = [item.strip() for item in skills_items]
+            
+            # Add default location
+            manual_json['location'] = 'Remote'
+            
+            # Save this manual extraction for debugging
+            with open(self.debug_dir / "manual_json_extraction.json", 'w') as f:
+                json.dump(manual_json, f, indent=2)
+                
+            if len(manual_json) >= 3:  # At least three fields found
+                return manual_json
+                
+            return None
+        except Exception as e:
+            self.logger.error(f"Error in JSON extraction: {str(e)}")
+            return None    
+    def get_api_usage_stats(self):
+        """Get current API usage statistics"""
+        return self.api_key_manager.get_usage_stats()
+        
+    def are_all_keys_exhausted(self):
+        """Check if all API keys have reached their daily limit"""
+        return self.api_key_manager.all_keys_exhausted()
+        
+    def test_connection(self):
+        """Test the Gemini API connection"""
+        try:
+            response = self.make_api_call(
+                "Hello, this is a connection test",
+                generation_config=genai.GenerationConfig(
+                    temperature=0.1,
+                    max_output_tokens=10,
+                )
+            )
+            return response is not None
+        except Exception as e:
+            self.logger.error(f"Connection test failed: {str(e)}")
+            return False

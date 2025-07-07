@@ -130,7 +130,7 @@ class ResumeHandler:
         
         # Clean up the job title for the filename
         # Extract important keywords for role type
-        role_keywords = ['SDET', 'QA', 'Test', 'Quality', 'Automation', 'Engineer', 'Lead', 'Senior', 'Manager']
+        role_keywords = ['SDET', 'QA', 'Test', 'Quality', 'Automation', 'Engineer', 'Lead', 'Senior', 'Manager', 'Business', 'Analyst', 'BA', 'Tester']
         
         # Find matching keywords in the job title
         role_parts = []
@@ -140,7 +140,7 @@ class ResumeHandler:
         
         # If no keywords found, use a generic "Role"
         if not role_parts:
-            role_type = "Role"
+            role_type = "QA"
         else:
             # Join found keywords to create role type
             role_type = "_".join(role_parts)

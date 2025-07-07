@@ -50,3 +50,7 @@ data/jobs/*
 data/resumes/*
 !data/resumes/QA_Automation_Lead_Example_Company_Zahid_Anwar_Resume.docx
 !data/resumes/QA_Automation_Lead_Example_Company_Zahid_Anwar_Resume.json
+
+# reports and tracking
+data/tracking/
+reports/
