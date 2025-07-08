@@ -47,6 +47,7 @@ DICE_LOGIN = {
     'password': 'Woodbridge@2023'
 }
 
+HEADLESS_MODE = True
 # ChromeDriver path
 CHROMEDRIVER_PATH = "webdriver\\chromedriver.exe"
 

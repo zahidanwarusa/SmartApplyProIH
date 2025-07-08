@@ -81,18 +81,29 @@ class DiceBot:
             self.logger.addHandler(ch)
 
     def setup_driver(self) -> bool:
-        """Simple Chrome WebDriver initialization with fresh profile"""
+        """Chrome WebDriver initialization with configurable headless mode"""
         try:
-            self.logger.info("Starting Chrome with fresh profile...")
+            from config import HEADLESS_MODE
             
-            # Clean, simple Chrome options
+            mode_text = "headless" if HEADLESS_MODE else "visible"
+            self.logger.info(f"Starting Chrome in {mode_text} mode...")
+            
             options = Options()
-            options.add_argument('--start-maximized')
-            options.add_argument('--disable-blink-features=AutomationControlled')  # Hide automation
+            
+            if HEADLESS_MODE:
+                options.add_argument('--headless')
+                options.add_argument('--window-size=1920,1080')
+                options.add_argument('--no-sandbox')
+                options.add_argument('--disable-dev-shm-usage')
+            else:
+                options.add_argument('--start-maximized')
+            
+            # Common options for both modes
+            options.add_argument('--disable-blink-features=AutomationControlled')
+            options.add_argument('--disable-extensions')
             options.add_experimental_option("excludeSwitches", ["enable-automation"])
             options.add_experimental_option('useAutomationExtension', False)
             
-            # Create driver with fresh profile (no conflicts)
             self.driver = webdriver.Chrome(options=options)
             self.wait = WebDriverWait(self.driver, 15)
             
