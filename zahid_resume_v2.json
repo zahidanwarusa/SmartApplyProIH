@@ -1,0 +1,146 @@
+{
+  "header": {
+    "name": "Zahid Anwar",
+    "email": "zahidsdet@gmail.com",
+    "phone": "(703) 909-5672",
+    "citizenship": "US Citizen",
+    "linkedin": "www.linkedin.com/in/zahid-anwar"
+  },
+  "professional_summary": {
+    "title_experience": "**Senior SDET** with **10+ years** leading test automation initiatives across **financial services** and **healthcare domains**.",
+    "track_record": "Proven track record of reducing **production defects by 75%** and achieving **80%+ automation coverage** through comprehensive framework development.",
+    "expertise": "Expert in **cloud-native testing**, **CI/CD integration**, and building high-performing QA teams in remote environments.",
+    "core_value": "Transform manual testing processes into scalable, automated solutions that accelerate delivery while maintaining enterprise-grade quality standards."
+  },
+  "core_competencies": {
+    "programming_and_automation": ["Java", "Python", "JavaScript/TypeScript", "SQL/PL-SQL", "Shell Scripting"],
+    "testing_frameworks": ["Selenium WebDriver", "REST Assured", "Appium", "Cypress", "TestNG", "JUnit", "Cucumber/BDD"],
+    "cloud_and_devops": ["AWS (EC2, RDS, CloudWatch, S3)", "Docker", "Kubernetes", "Jenkins", "GitLab CI", "CI/CD Pipelines"],
+    "api_and_performance": ["REST/SOAP APIs", "Postman", "JMeter", "LoadRunner", "Microservices Testing", "Contract Testing"],
+    "quality_tools": ["Maven", "Gradle", "SonarQube", "Jira", "Confluence", "Git/GitHub", "Splunk"],
+    "databases": ["Oracle", "SQL Server", "PostgreSQL", "MySQL", "MongoDB", "DB2"],
+    "domain_expertise": ["Healthcare (HL7/FHIR, HIPAA)", "Financial Services (nCino, Loan Origination)", "Regulatory Compliance"],
+    "leadership": ["Team Mentoring", "Technical Strategy", "Agile Transformation", "Stakeholder Management"]
+  },
+  "professional_experience": [
+    {
+      "company": "SunTrust Bank",
+      "location": "Richmond, VA",
+      "position": "Technical Test Lead",
+      "duration": "July 2020 -- Present",
+      "summary": "Lead comprehensive test automation strategy for enterprise banking applications and for \"RESOLVE\" project, managing testing lifecycle for critical financial systems including **loan origination** and **Salesforce integrations**.",
+      "key_achievements": [
+        "Reduced **production defects by 75%** through implementation of comprehensive API testing strategies using **REST Assured**",
+        "Achieving **80% automation coverage** across UI, API, and mobile testing frameworks, improving deployment velocity",
+        "Led team of **6 QA engineers**, providing mentorship and establishing automation-first culture that increased **team productivity by 40%**"
+      ],
+      "detailed_achievements": [
+        "Integrated Salesforce with nCino for loan origination workflows, ensuring seamless data flow and user experience validation",
+        "Architected **BDD framework** using **Cucumber and Java**, reducing requirement ambiguity by **40%** and improving business-technical collaboration",
+        "Optimized **CI/CD pipelines** with **Jenkins integration**, enabling automated testing for **15+ concurrent feature releases**",
+        "Built robust test automation frameworks for **UI (Selenium)**, **API (REST Assured)**, and **Mobile (Appium)** testing",
+        "Managed **AWS test environments** using **EC2, RDS, and CloudWatch** for comprehensive software testing scenarios",
+        "Implemented **containerized testing** with **Docker and Kubernetes**, improving environment stability by **70%**",
+        "Conducted **performance testing** using **JMeter** and **AWS Load Balancer** for loan origination systems",
+        "Established **code review processes** and technical guidance, reducing technical debt by **40%**"
+      ],
+      "environment": "Java, Selenium, REST Assured, AWS, Docker, Kubernetes, Jenkins, Jira, Git, Oracle, SQL Server"
+    },
+    {
+      "company": "Aetna Health Insurance",
+      "location": "Franklin, TN",
+      "position": "Technical Test Lead",
+      "duration": "August 2017 -- June 2020",
+      "summary": "Led end-to-end testing for healthcare applications including **Medicare Claims Adjudication System** and **FHIR API implementations**, ensuring compliance with healthcare regulations and industry standards.",
+      "key_achievements": [
+        "Delivered **100% compliant testing** for **Medicare Claims Adjudication System** incorporating new **CMS directives**",
+        "Validated **FHIR API implementations** ensuring adherence to **HL7 standards** and **HIPAA compliance** requirements",
+        "Executed comprehensive **performance testing** using **JMeter**, identifying and resolving critical bottlenecks affecting claims processing efficiency"
+      ],
+      "detailed_achievements": [
+        "Managed testing team across multiple healthcare projects with focus on **regulatory compliance** and **data integrity**",
+        "Developed automated test protocols for **HL7/FHIR data exchange** and **EDI X12 transaction processing**",
+        "Implemented end-to-end validation from **front-end applications** to **DB2 databases** ensuring data integrity",
+        "Created comprehensive test cases for **HIPAA 837I/P (4010)** transaction sets and compliance validation",
+        "Established quality gates for **Provider, Group, Member, and Billing** module testing"
+      ],
+      "environment": "Quality Center, Oracle, JMeter, HIPAA/HL7 Standards, DB2, Agile/Scrum"
+    },
+    {
+      "company": "Technical Resources International",
+      "location": "Bethesda, MD",
+      "position": "Sr Software Tester",
+      "duration": "December 2014 -- July 2017",
+      "summary": "Led testing for **CROMS Data Exchange, Web Library, and Document Library** across multiple **CMS Medicare/Medicaid** releases; executed web services and database validations during large-scale healthcare data transitions.",
+      "key_achievements": [
+        "Created detailed **test plans, strategies, and estimations**; developed and executed **manual and automated test cases** using **IBM Rational Quality Manager (RQM)** and **Rational Functional Tester (RFT)**, supporting **CI pipelines** and building reusable regression test suites.",
+        "Conducted **SQL/PLSQL-based backend testing** on **RDBMS**, validating **CRUD operations** and **ACID properties**; verified CMS claim, enrollment, and provider/member data accuracy across systems and supported **UAT execution** with precise test data management."
+      ],
+      "detailed_achievements": [
+        "Reviewed CMS and HIPAA-driven requirements with **BAs and developers**; authored verification points, ensured requirement testability, and managed full **STLC coverage** using **Rational Requirements & Configuration Management** tools.",
+        "Executed **integration, negative, stress, and interoperability testing** across multi-platform healthcare applications; logged and managed defects via **IBM Rational ClearQuest**, led triage efforts, and resolved high-severity CMS production issues."
+      ],
+      "environment": "IBM RQM • RFT • Rational ClearQuest • Rational Req & Config Mgmt • SQL • PL/SQL • RDBMS • CICS • Uncle Bob • MS Project • Visio • Waterfall • CMS • HIPAA • Medicare/Medicaid"
+    },
+    {
+      "company": "Dean Health Plan",
+      "location": "Madison, WI",
+      "position": "Sr. QA Tester",
+      "duration": "August 2014 -- December 2014",
+      "summary": "Focused on **Medicaid/Medicare claim processing, provider payment validation, payer integration**, and ensured compliance with healthcare standards across **HIPAA-regulated** systems.",
+      "key_achievements": [
+        "Tested **835 transactions** and **EOPs** from **DHP to Emdeon** for **FedMed**; validated claims using **DDE** and **X-12** via **SDS portal**; ensured new vendor integration readiness.",
+        "Created **Test Plans**, **Strategy**, **Estimates**; reviewed **Requirements**, **LSA**, **TDD**, and **Impact Assessments**; contributed to **Traceability Matrix**; ensured **HIPAA** compliance."
+      ],
+      "detailed_achievements": [
+        "Developed/maintained **QTP/UFT** scripts with **VBScript** for regression/sanity testing; uploaded/executed tests in **HP ALM/Quality Center 11**; built reusable test libraries.",
+        "Conducted **Load/Performance Testing** using **LoadRunner**; created web scripts, failover/peak load scenarios, analyzed server behavior, and reported via **LoadRunner Analysis**.",
+        "Managed full **Defect Lifecycle** in ALM; led defect meetings; collaborated with **devs, DBAs, analysts** to resolve healthcare data and mapping issues.",
+        "Set up **UAT environments**; coordinated test execution; supported QA onboarding; participated in **Agile/Scrum**, **cross-team**, and **environment utilization** meetings."
+      ],
+      "environment": "HP ALM 11 • QTP/UFT • LoadRunner • SQL • Java • Oracle • METAVANCE • SDS Portal • X-12 • DDE • Agile • HIPAA"
+    },
+    {
+      "company": "Xerox State Healthcare",
+      "location": "West Sacramento, CA",
+      "position": "Sr. QA Tester",
+      "duration": "December 2013 -- August 2014",
+      "summary": "Worked on **Data Validation** and **Data Verification** for the Crosswalk Mapping File on **CICS Screens**.",
+      "key_achievements": [
+        "Performed **code validation** on **ICD-9** and **ICD-10** codes in the **UPDATE File** for the Crosswalk Mapping File.",
+        "Created detailed **specifications** to support the business transition from **HIPAA 4010A to 5010**, and from **ICD-9 to ICD-10**.",
+        "Conducted **claim testing** using **DDE** and **X-12 files** through the **Online Portal**."
+      ],
+      "detailed_achievements": [
+        "Applied **ICD-9/ICD-10 coding standards** within **Medicare** and **Medicaid** domains, including for **inpatients**, **outpatients**, and **reimbursement methodologies**.",
+        "Developed a **Job Aid** for the **UPDATE Process** of the Crosswalk Mapping File.",
+        "Organized and facilitated **training sessions** for over **40 team members** to enhance understanding of the Update Process of the Crosswalk Mapping File.",
+        "Collected and validated an **inventory of applications**, **interfaces**, and **reports** requiring modifications to comply with **ICD-10 requirements**.",
+        "Used **Mainframe (CICS)** to validate **ICD-9/ICD-10 codes**, perform **Crosswalk Mapping** updates, test **EDI (834/837/835)** via **DDE/X-12**, supporting **Medicare/Medicaid** ICD-10 transition.",
+        "Managed **change requests** using **Rational ClearQuest**.",
+        "Played a key role in **defect management** using **ClearQuest**, collaborating with the **development team** to resolve **critical and high-priority defects**."
+      ],
+      "environment": "Clear Quest, Test manager, Waterfall, RQM, Mainframe, Uncle Bob, HIPAA, SQL SERVER, MS Project, MS Office, Visio"
+    }
+  ],
+  "education": [
+    {
+      "degree": "MBA",
+      "major": "Information Technology",
+      "university": "Strayer University, USA",
+      "year": "2016"
+    },
+    {
+      "degree": "MS",
+      "major": "Economics", 
+      "university": "University of Sargodha",
+      "year": "2007"
+    },
+    {
+      "degree": "BSc",
+      "major": "Mathematics & Computer Science",
+      "university": "University of Sargodha", 
+      "year": "2003"
+    }
+  ]
+}

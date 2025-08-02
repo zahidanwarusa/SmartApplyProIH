@@ -16,14 +16,14 @@ from config import DEFAULT_RESUME, RESUME_DIR
 from gemini_service import GeminiService
 
 class ResumeHandler:
-    """Handles resume generation and optimization"""
+    """Handles resume generation and optimization for the new v2 format"""
     
     def __init__(self):
         self.gemini = GeminiService()
         self.logger = logging.getLogger(__name__)
         
     def generate_resume(self, job_details: Dict) -> Optional[str]:
-        """Generate optimized resume for a job"""
+        """Generate optimized resume for a job using the new v2 format"""
         try:
             # Load default resume
             if not DEFAULT_RESUME.exists():
@@ -39,12 +39,11 @@ class ResumeHandler:
             # Log details for debugging
             self.logger.info(f"Processing resume for job: {job_details.get('title', 'Unknown')}")
             
-            # Process sections
+            # Process sections for new v2 format
             sections_to_process = [
-                'career_summary',
-                'professional_summary', 
-                'technical_skills',
-                'work_experience'
+                'professional_summary',
+                'core_competencies', 
+                'professional_experience'
             ]
             
             for section_name in sections_to_process:
@@ -90,7 +89,7 @@ class ResumeHandler:
             with open(json_path, 'w') as f:
                 json.dump(resume_data, f, indent=2)
                 
-            # Convert to DOCX using ResumeConverter implementation
+            # Convert to DOCX using updated ResumeConverter
             converter = ResumeConverter()
             converter.convert_resume(resume_data)
             converter.save(str(resume_path))
@@ -169,14 +168,14 @@ class ResumeHandler:
 
 
 class ResumeConverter:
-    """Converts resume JSON to formatted DOCX document"""
+    """Converts resume JSON to formatted DOCX document using new v2 format"""
     
     def __init__(self):
         self.doc = Document()
         self._setup_document()
         
     def _setup_document(self):
-        """Setup document properties and styles"""
+        """Setup document properties and styles with correct fonts"""
         # Set up margins (narrow)
         sections = self.doc.sections
         for section in sections:
@@ -187,28 +186,28 @@ class ResumeConverter:
             section.page_height = Inches(11)  # Letter size
             section.page_width = Inches(8.5)
         
-        # Set up styles
+        # Set up styles with user-specified fonts
         styles = self.doc.styles
         
-        # Heading style (Times New Roman)
+        # Heading style (Tahoma as requested)
         style_heading = styles['Heading 1']
         font = style_heading.font
-        font.name = 'Times New Roman'
+        font.name = 'Tahoma'
         font.size = Pt(14)
         font.bold = True
         font.color.rgb = RGBColor(0, 0, 0)
         
-        # Normal text style (Tahoma)
+        # Normal text style (Calibri as requested)
         style_normal = styles['Normal']
         font = style_normal.font
-        font.name = 'Tahoma'
+        font.name = 'Calibri'
         font.size = Pt(11)
         font.color.rgb = RGBColor(0, 0, 0)
         
         # Set up list style
         style_list = styles.add_style('Custom List', style_normal.type)
         font = style_list.font
-        font.name = 'Tahoma'
+        font.name = 'Calibri'
         font.size = Pt(11)
         paragraph_format = style_list.paragraph_format
         paragraph_format.left_indent = Inches(0.25)
@@ -237,7 +236,7 @@ class ResumeConverter:
         # Create a new Run object and add the hyperlink into it
         r = paragraph.add_run()
         r._r.append(hyperlink)
-        r.font.name = 'Tahoma'
+        r.font.name = 'Calibri'
         r.font.color.rgb = RGBColor(0, 0, 255)
         
         return r
@@ -253,8 +252,9 @@ class ResumeConverter:
         
         # Name on left
         name_run = p.add_run(header_data['name'])
-        name_run.font.name = 'Times New Roman'
+        name_run.font.name = 'Tahoma'
         name_run.font.bold = True
+        name_run.font.size = Pt(12)
         
         p.add_run(' | ')
         
@@ -265,7 +265,7 @@ class ResumeConverter:
         
         # Phone on right
         phone_run = p.add_run(header_data['phone'])
-        phone_run.font.name = 'Tahoma'
+        phone_run.font.name = 'Calibri'
         
         # Second line: Citizenship and LinkedIn
         p = header.add_paragraph()
@@ -273,7 +273,7 @@ class ResumeConverter:
         
         # Citizenship on left
         citizen_run = p.add_run(header_data['citizenship'])
-        citizen_run.font.name = 'Tahoma'
+        citizen_run.font.name = 'Calibri'
         
         p.add_run(' | ')
         
@@ -281,232 +281,207 @@ class ResumeConverter:
         linkedin_url = "https://" + header_data['linkedin'] if not header_data['linkedin'].startswith(('http://', 'https://')) else header_data['linkedin']
         self._add_hyperlink(p, header_data['linkedin'], linkedin_url)
 
-    def _add_education(self, education_data: List[Dict]):
-        """Add education section"""
-        heading = self.doc.add_heading('Education', level=1)
+    def _add_professional_summary(self, summary_data: Dict):
+        """Add the new unified professional summary section"""
+        heading = self.doc.add_heading('PROFESSIONAL SUMMARY', level=1)
         heading.style = self.doc.styles['Heading 1']
         for run in heading.runs:
-            run.font.name = 'Times New Roman'
+            run.font.name = 'Tahoma'
+            run.font.bold = True
         
-        for edu in education_data:
-            # University line
-            p = self.doc.add_paragraph(style='Custom List')
-            p.add_run('• ').bold = False
-            univ_run = p.add_run(edu['university'])
-            univ_run.bold = False
+        # Title and experience line
+        p = self.doc.add_paragraph()
+        self._add_formatted_text(p, summary_data.get('title_experience', ''))
+        p.paragraph_format.space_after = Pt(6)
+        
+        # Track record line
+        p = self.doc.add_paragraph()
+        self._add_formatted_text(p, summary_data.get('track_record', ''))
+        p.paragraph_format.space_after = Pt(6)
+        
+        # Expertise line
+        p = self.doc.add_paragraph()
+        self._add_formatted_text(p, summary_data.get('expertise', ''))
+        p.paragraph_format.space_after = Pt(6)
+        
+        # Core value line (with "Core Value:" prefix)
+        p = self.doc.add_paragraph()
+        core_value_run = p.add_run('Core Value: ')
+        core_value_run.font.name = 'Calibri'
+        core_value_run.font.bold = True
+        
+        self._add_formatted_text(p, summary_data.get('core_value', ''))
+        p.paragraph_format.space_after = Pt(12)
+
+    def _add_core_competencies(self, competencies: Dict):
+        """Add the detailed core competencies section"""
+        heading = self.doc.add_heading('CORE COMPETENCIES', level=1)
+        heading.style = self.doc.styles['Heading 1']
+        for run in heading.runs:
+            run.font.name = 'Tahoma'
+            run.font.bold = True
+        
+        # Category mappings for proper display names
+        category_display_names = {
+            'programming_and_automation': 'Programming & Automation',
+            'testing_frameworks': 'Testing Frameworks',
+            'cloud_and_devops': 'Cloud & DevOps',
+            'api_and_performance': 'API & Performance',
+            'quality_tools': 'Quality Tools',
+            'databases': 'Databases',
+            'domain_expertise': 'Domain Expertise',
+            'leadership': 'Leadership'
+        }
+        
+        for category_key, skills in competencies.items():
+            if not skills:  # Skip empty categories
+                continue
+                
+            p = self.doc.add_paragraph()
             
-            # Degree line with spacing
-            p = self.doc.add_paragraph(style='Custom List')
-            p.paragraph_format.left_indent = Inches(0.5)
-            p.paragraph_format.space_before = Pt(0)
-            degree_run = p.add_run(edu['degree'])
-            degree_run.bold = True
-            p.add_run(f" in {edu['major']} ({edu['year']})").bold = False
+            # Add category name in bold
+            display_name = category_display_names.get(category_key, category_key.replace('_', ' ').title())
+            category_run = p.add_run(f'{display_name}: ')
+            category_run.font.name = 'Calibri'
+            category_run.font.bold = True
             
-            # Less space after each education entry
+            # Add skills separated by bullet points
+            for i, skill in enumerate(skills):
+                if i > 0:
+                    bullet_run = p.add_run(' • ')
+                    bullet_run.font.name = 'Calibri'
+                
+                # Handle bold formatting in skills
+                self._add_formatted_text(p, skill)
+            
             p.paragraph_format.space_after = Pt(6)
 
-    def _add_career_summary(self, summary_data: List[str]):
-        """Add career summary section"""
-        heading = self.doc.add_heading('Career Summary', level=1)
+    def _add_professional_experience(self, experiences: List[Dict]):
+        """Add professional experience section with new format"""
+        heading = self.doc.add_heading('PROFESSIONAL EXPERIENCE', level=1)
         heading.style = self.doc.styles['Heading 1']
         for run in heading.runs:
-            run.font.name = 'Times New Roman'
-        
-        for paragraph in summary_data:
-            p = self.doc.add_paragraph()
-            # Handle bold highlighting with ** markers
-            parts = paragraph.split('**')
-            for i, part in enumerate(parts):
-                run = p.add_run(part)
-                run.bold = i % 2 == 1  # Odd indices are bold
-                run.font.name = 'Tahoma'
-
-    def _add_professional_summary(self, summary_data: Dict):
-        """Add professional summary section"""
-        heading = self.doc.add_heading('Professional Summary', level=1)
-        heading.style = self.doc.styles['Heading 1']
-        for run in heading.runs:
-            run.font.name = 'Times New Roman'
-        
-        # Overview paragraph
-        p = self.doc.add_paragraph()
-        # Handle bold highlighting with ** markers
-        parts = summary_data['overview'].split('**')
-        for i, part in enumerate(parts):
-            run = p.add_run(part)
-            run.bold = i % 2 == 1
             run.font.name = 'Tahoma'
-        
-        # Bullet points
-        for highlight in summary_data['highlights']:
-            p = self.doc.add_paragraph(style='Custom List')
-            p.add_run('• ')
-            # Handle bold highlighting with ** markers
-            parts = highlight.split('**')
-            for i, part in enumerate(parts):
-                run = p.add_run(part)
-                run.bold = i % 2 == 1
-                run.font.name = 'Tahoma'
-
-    def _add_technical_skills(self, skills: Dict[str, List[str]]):
-        """Add technical skills section with tabular format"""
-        heading = self.doc.add_heading('Technical Skills', level=1)
-        heading.style = self.doc.styles['Heading 1']
-        for run in heading.runs:
-            run.font.name = 'Times New Roman'
-        
-        # Create table with exact number of rows needed
-        num_skills = len(skills)
-        table = self.doc.add_table(rows=num_skills, cols=2)
-        table.style = 'Table Grid'
-        table.autofit = True
-        
-        # Fill table
-        for idx, (category, items) in enumerate(skills.items()):
-            row = table.rows[idx].cells
-            
-            # Category name in first column
-            category_name = category.replace('_', ' ').title()
-            category_para = row[0].paragraphs[0]
-            category_run = category_para.add_run(category_name)
-            category_run.bold = True
-            category_run.font.name = 'Tahoma'
-            
-            # Build skills list for second column
-            skills_para = row[1].paragraphs[0]
-            
-            # Process each skill item to handle any bold formatting
-            for i, skill in enumerate(items):
-                if i > 0:
-                    # Add comma separator between skills
-                    skills_para.add_run(", ").font.name = 'Tahoma'
-                
-                # Check if the skill has bold formatting
-                if '**' in skill:
-                    parts = skill.split('**')
-                    for j, part in enumerate(parts):
-                        if part:  # Skip empty parts
-                            run = skills_para.add_run(part)
-                            run.bold = j % 2 == 1  # Odd indices are bold
-                            run.font.name = 'Tahoma'
-                else:
-                    # No bold formatting, add as regular text
-                    run = skills_para.add_run(skill)
-                    run.font.name = 'Tahoma'
-            
-        # Set column widths
-        table.columns[0].width = Inches(2.0)
-        table.columns[1].width = Inches(5.0)
-
-    def _add_work_experience(self, experiences: List[Dict]):
-        """Add work experience section with specified layout"""
-        heading = self.doc.add_heading('Work Experience', level=1)
-        heading.style = self.doc.styles['Heading 1']
-        for run in heading.runs:
-            run.font.name = 'Times New Roman'
+            run.font.bold = True
             
         # Add space after heading
         heading.paragraph_format.space_after = Pt(12)
         
         for exp in experiences:
-            # Company name
+            # Company name and location on same line with separator
             p = self.doc.add_paragraph()
-            p.paragraph_format.space_after = Pt(2)
-            company_run = p.add_run(exp['company'])
+            company_run = p.add_run(f"{exp['company']} | {exp['location']}")
             company_run.bold = True
-            company_run.font.name = 'Tahoma'
-            
-            # Location
-            p = self.doc.add_paragraph()
-            p.paragraph_format.space_before = Pt(2)
+            company_run.font.name = 'Calibri'
+            company_run.font.size = Pt(12)
             p.paragraph_format.space_after = Pt(2)
-            location_run = p.add_run(exp['location'])
-            location_run.font.name = 'Tahoma'
             
-            # Duration
+            # Position and duration on same line
             p = self.doc.add_paragraph()
-            p.paragraph_format.space_before = Pt(2)
-            p.paragraph_format.space_after = Pt(2)
-            duration_run = p.add_run(exp['duration'])
-            duration_run.italic = True
-            duration_run.font.name = 'Tahoma'
-            
-            # Position
-            p = self.doc.add_paragraph()
-            p.paragraph_format.space_before = Pt(2)
-            p.paragraph_format.space_after = Pt(6)
-            position_run = p.add_run(exp['position'])
+            position_run = p.add_run(f"{exp['position']} | {exp['duration']}")
             position_run.bold = True
-            position_run.font.name = 'Tahoma'
+            position_run.font.name = 'Calibri'
+            p.paragraph_format.space_after = Pt(6)
             
             # Summary paragraph
             if exp.get('summary'):
                 p = self.doc.add_paragraph()
-                p.paragraph_format.space_before = Pt(2)
+                self._add_formatted_text(p, exp['summary'])
                 p.paragraph_format.space_after = Pt(6)
-                
-                # Handle bold highlighting with ** markers
-                parts = exp['summary'].split('**')
-                for i, part in enumerate(parts):
-                    run = p.add_run(part)
-                    run.bold = i % 2 == 1
-                    run.font.name = 'Tahoma'
             
-            # Achievements
-            for achievement in exp['achievements']:
-                p = self.doc.add_paragraph(style='Custom List')
-                p.paragraph_format.left_indent = Inches(0.25)
-                p.paragraph_format.space_before = Pt(2)
-                p.paragraph_format.space_after = Pt(2)
-                p.add_run('• ')
-                
-                # Handle bold highlighting with ** markers
-                parts = achievement.split('**')
-                for i, part in enumerate(parts):
-                    run = p.add_run(part)
-                    run.bold = i % 2 == 1
-                    run.font.name = 'Tahoma'
+            # Key achievements (if present)
+            if exp.get('key_achievements'):
+                for achievement in exp['key_achievements']:
+                    p = self.doc.add_paragraph(style='Custom List')
+                    p.paragraph_format.left_indent = Inches(0)
+                    p.paragraph_format.space_before = Pt(2)
+                    p.paragraph_format.space_after = Pt(2)
+                    
+                    bullet_run = p.add_run('• ')
+                    bullet_run.font.name = 'Calibri'
+                    
+                    self._add_formatted_text(p, achievement)
             
-            # Environment (optional)
+            # Detailed achievements
+            if exp.get('detailed_achievements'):
+                for achievement in exp['detailed_achievements']:
+                    p = self.doc.add_paragraph(style='Custom List')
+                    p.paragraph_format.left_indent = Inches(0)
+                    p.paragraph_format.space_before = Pt(2)
+                    p.paragraph_format.space_after = Pt(2)
+                    
+                    bullet_run = p.add_run('• ')
+                    bullet_run.font.name = 'Calibri'
+                    
+                    self._add_formatted_text(p, achievement)
+            
+            # Environment (if present)
             if exp.get('environment'):
                 p = self.doc.add_paragraph()
-                p.paragraph_format.left_indent = Inches(0.25)
                 p.paragraph_format.space_before = Pt(6)
                 p.paragraph_format.space_after = Pt(6)
                 env_run = p.add_run('Environment: ')
                 env_run.bold = True
-                env_run.font.name = 'Tahoma'
+                env_run.font.name = 'Calibri'
                 
-                # Handle bold highlighting with ** markers
-                parts = exp['environment'].split('**')
-                for i, part in enumerate(parts):
-                    run = p.add_run(part)
-                    run.bold = i % 2 == 1
-                    run.font.name = 'Tahoma'
+                self._add_formatted_text(p, exp['environment'])
                     
             # Add spacing after each experience entry
             self.doc.add_paragraph().paragraph_format.space_after = Pt(12)
 
+    def _add_education(self, education_data: List[Dict]):
+        """Add education section"""
+        heading = self.doc.add_heading('EDUCATION', level=1)
+        heading.style = self.doc.styles['Heading 1']
+        for run in heading.runs:
+            run.font.name = 'Tahoma'
+            run.font.bold = True
+        
+        for edu in education_data:
+            p = self.doc.add_paragraph()
+            
+            # Format: MBA, Information Technology | Strayer University, USA (2016)
+            degree_run = p.add_run(f"{edu['degree']}, {edu['major']}")
+            degree_run.font.name = 'Calibri'
+            degree_run.font.bold = True
+            
+            separator_run = p.add_run(' | ')
+            separator_run.font.name = 'Calibri'
+            
+            university_run = p.add_run(f"{edu['university']} ({edu['year']})")
+            university_run.font.name = 'Calibri'
+            
+            p.paragraph_format.space_after = Pt(6)
+
+    def _add_formatted_text(self, paragraph, text):
+        """Add text to paragraph with proper bold formatting"""
+        if not text:
+            return
+            
+        # Handle bold highlighting with ** markers
+        parts = text.split('**')
+        for i, part in enumerate(parts):
+            if part:  # Skip empty parts
+                run = paragraph.add_run(part)
+                run.bold = i % 2 == 1  # Odd indices are bold
+                run.font.name = 'Calibri'
+
     def convert_resume(self, resume_data: Dict):
-        """Convert full resume from JSON data to DOCX"""
+        """Convert full resume from JSON data to DOCX using new v2 format"""
         # Create header
         self._create_header(resume_data['header'])
         
-        # Add Education
-        self._add_education(resume_data['education'])
-        
-        # Add Career Summary
-        self._add_career_summary(resume_data['career_summary'])
-        
-        # Add Professional Summary
+        # Add Professional Summary (new unified section)
         self._add_professional_summary(resume_data['professional_summary'])
         
-        # Add Technical Skills
-        self._add_technical_skills(resume_data['technical_skills'])
+        # Add Core Competencies (replaces technical skills)
+        self._add_core_competencies(resume_data['core_competencies'])
         
-        # Add Work Experience
-        self._add_work_experience(resume_data['work_experience'])
+        # Add Professional Experience
+        self._add_professional_experience(resume_data['professional_experience'])
+        
+        # Add Education
+        self._add_education(resume_data['education'])
 
     def save(self, filename: str):
         """Save the document"""

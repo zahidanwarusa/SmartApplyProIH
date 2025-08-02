@@ -1,12 +1,38 @@
-Role: SDET - Kotlin
-Implementation Partner: Altimetrik
-Client:  Sofi
-Job Type: Full-time(Remote)
+**Subject: SAP EWM Principal Consultant / United States / Permanent**
 
-Job Description:
-Design and implement automated functional test suites using Kotlin.
-Develop and maintain performance/load testing frameworks and tools (e.g., Gatling, JMeter, k6, or similar).
-Conduct load, stress, scalability, soak, and spike tests to evaluate application behavior under various scenarios.
-Collaborate with development teams to integrate test automation into CI/CD pipelines.
-Analyze test results and provide detailed reports with bottleneck identification and tuning suggestions.
-should be able to understand the domain of our system and write acceptance tests, and having experience setting up performance tests is a plus
+Hi Zahid A.,
+
+I hope this email finds you well. I am reaching out regarding a position I am currently recruiting for that I believe would be an excellent match for your background and expertise. After reviewing numerous resumes, I found your profile to be particularly well-suited for this role.
+
+**Position: SAP EWM Principal Consultant**  
+**Location:** United States  
+**Employment Type:** Permanent
+
+## Required Qualifications:
+- Minimum 11 years of experience in Information Technology
+- Strong ability to analyze business requirements related to warehouse management and design scalable EWM solutions
+- Extensive experience configuring EWM components, including:
+  - Inbound & outbound processing
+  - Goods receipt & issue processes
+  - Putaway, picking, and packing strategies
+  - Physical inventory and stock movements
+- Experience processing deliveries via TU and handling SMQ2/SMQ1 messages with troubleshooting capabilities
+- Solid understanding of RF framework and mobile data entry processes
+- Proficiency in setting up and managing Warehouse Monitor and Handling Unit Management
+
+## Preferred Qualifications:
+- Experience with integration design and configuration between EWM and SAP S/4HANA modules (MM, SD, PP, QM, and TM)
+- Knowledge of 3rd party logistics systems or automation solutions (e.g., MFS, ASRS)
+- Proven experience collaborating with SAP ABAP developers for custom enhancements, user exits, and RF screens
+- Proven experience developing test scenarios and supporting system and integration testing (SIT)
+- Experience leading User Acceptance Testing (UAT) sessions and resolving defects
+- Track record of ensuring timely deployment of developments and supporting data migration activities
+- Ability to provide ongoing support to end users for day-to-day business issues
+
+I would be happy to discuss this opportunity with you in more detail. Please let me know if you would be interested in learning more about this position.
+
+Best regards,
+
+**Pavan Kalyan Kalva**  
+Avance Services  
+Email: pavankalyan.k@avanceservices.us

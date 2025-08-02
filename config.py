@@ -13,7 +13,7 @@ for directory in [DATA_DIR, RESUME_DIR, JOBS_DIR, TEMP_DIR]:
     directory.mkdir(parents=True, exist_ok=True)
 
 # Default resume template
-DEFAULT_RESUME = BASE_DIR / 'default-resume-zahid.json'
+DEFAULT_RESUME = BASE_DIR / 'zahid_resume_v2.json'
 if not DEFAULT_RESUME.exists():
     raise FileNotFoundError(f"Default resume template not found: {DEFAULT_RESUME}")
 
@@ -86,49 +86,6 @@ JOB_TITLES = [
   "QA Engineer", 
   "Test Engineer",
   "Software Test Engineer",
-  "Principal SDET",
-  "Staff SDET",
-  "Test Architect",
-  "Automation Architect",
-  "Performance Test Engineer",
-  "API Test Engineer",
-  "Mobile Test Engineer",
-  "Automation Developer",
-  "QA Developer",
-  "Test Developer",
-  "DevOps Engineer",
-  "Automation Engineer",
-  "Quality Engineer",
-  "Software Quality Engineer",
-  "Test Automation Developer",
-  "Senior QA Engineer",
-  "Lead QA Engineer",
-  "Principal QA Engineer",
-  "QA Analyst",
-  "Test Analyst",
-  "Automation Specialist",
-  "Test Automation Specialist",
-  "QA Specialist",
-  "Testing Engineer",
-  "Software Testing Engineer",
-  "Selenium Automation Engineer",
-  "Cypress Automation Engineer",
-  "UI Automation Engineer",
-  "Web Automation Engineer",
-  "Backend Test Engineer",
-  "Frontend Test Engineer",
-  "Full Stack Test Engineer",
-  "Security Test Engineer",
-  "Load Test Engineer",
-  "Integration Test Engineer",
-  "End to End Test Engineer",
-  "Healthcare QA Engineer",
-  "Medical Device Test Engineer",
-  "Healthcare Automation Engineer",
-  "HIPAA Compliance Test Engineer",
-  "Clinical Software Test Engineer",
-  "EMR Test Engineer",
-  "Healthcare Software Quality Engineer"
 ]
 # Search URL template
 DICE_SEARCH_URL = "https://www.dice.com/jobs?q={}&countryCode=US&pageSize=20&filters.workplaceTypes=Remote&filters.easyApply=true&language=en"
