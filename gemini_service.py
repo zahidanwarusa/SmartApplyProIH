@@ -561,16 +561,15 @@ class GeminiService:
             self.logger.error(f"Error optimizing work experience: {str(e)}")
             return experiences
             
-    def _create_work_experience_prompt(self, job, job_details):
-        """Create prompt for work experience job optimization - updated for v2"""
-        # Make skills a comma-separated string
+    def _create_work_experience_prompt(self, current_content, job_details):
+        """Create prompt for work experience optimization with FIXED environment section handling"""
         skills_str = ', '.join(job_details.get('skills', []))
         
         prompt = f"""
-        I need you to optimize a work experience entry for a resume to highlight skills and achievements relevant to the following job.
+        I need you to optimize the work experience section of a resume for the following job.
 
-        Current Work Experience Entry:
-        {json.dumps(job, indent=2)}
+        Current Work Experience:
+        {json.dumps(current_content, indent=2)}
         
         Job Details:
         Title: {job_details.get('title', '')}
@@ -578,34 +577,22 @@ class GeminiService:
         Description: {job_details.get('description', '')}
 
         Instructions:
-        1. Keep the same structure with company, location, position, duration, summary, key_achievements, detailed_achievements, environment
-        2. Optimize the summary, key_achievements, and detailed_achievements to highlight relevance to the job description
-        3. Use ** to highlight key terms relevant to the job (Example: **automation testing**, **performance testing**)
-        4. Preserve specific metrics and percentages (like "75%", "80% automation coverage", "40%", etc.)
-        5. Do not add or remove fields from the original structure
-        6. Maintain professional language and specific technical achievements
-        7. Return ONLY a valid JSON object that can be parsed directly
+        1. Keep the exact same structure for each job
+        2. Optimize achievements to highlight skills relevant to the job
+        3. Use ** to highlight key skills relevant to the job (Example: **Python**, **Selenium**)
+        4. For the 'environment' field: ONLY list technical tools, technologies, and platforms - NO narrative text or explanatory phrases
+        5. Environment should be a simple comma-separated list like: "Java, Selenium, AWS, Docker, Jenkins"
+        6. Do NOT add phrases like "demonstrating passion" or "showcasing skills" to the environment section
+        7. Maintain specific metrics and achievements where they exist
+        8. Your output must be a valid JSON array that can be parsed directly
         
-        IMPORTANT: Return ONLY the JSON object with updated content, no other explanation or text before or after it.
+        CRITICAL: The environment field should contain ONLY technical tools and technologies, nothing else.
         
-        For example, your response should look like:
-        {{
-          "company": "Company Name",
-          "location": "Location",
-          "position": "Position Title",
-          "duration": "Duration",
-          "summary": "Summary with **highlighted terms**...",
-          "key_achievements": [
-            "First achievement with **key skills** and specific metrics...",
-            "Second achievement with more **relevant experience**..."
-          ],
-          "detailed_achievements": [...],
-          "environment": "Environment with **key technologies**..."
-        }}
+        IMPORTANT: Return ONLY the JSON array with updated content, no other explanation or text before or after it.
         """
         
         return prompt
-        
+   
     def _process_work_experience_response(self, response_text, original_job):
         """Process and extract work experience job content from response - updated for v2"""
         try:

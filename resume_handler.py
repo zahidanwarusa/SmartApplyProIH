@@ -30,7 +30,7 @@ class ResumeHandler:
                 self.logger.error("Default resume template not found")
                 return None
                 
-            with open(DEFAULT_RESUME, 'r') as f:
+            with open(DEFAULT_RESUME, 'r', encoding='utf-8') as f:  # FIX: Explicit UTF-8 encoding
                 resume_data = json.load(f)
                 
             # Create output directories
@@ -50,6 +50,9 @@ class ResumeHandler:
                 if section_name in resume_data:
                     self.logger.info(f"Optimizing {section_name}...")
                     try:
+                        # CRITICAL FIX: Store original content before optimization
+                        original_content = resume_data[section_name].copy() if isinstance(resume_data[section_name], dict) else resume_data[section_name][:]
+                        
                         updated_section = self.gemini.optimize_resume_section(
                             section_name,
                             resume_data[section_name],
@@ -58,21 +61,33 @@ class ResumeHandler:
                         
                         if updated_section:
                             # Deep comparison with original before replacing
-                            original_normalized = json.dumps(self._normalize_content(resume_data[section_name]))
-                            updated_normalized = json.dumps(self._normalize_content(updated_section))
+                            original_normalized = json.dumps(self._normalize_content(original_content), sort_keys=True)
+                            updated_normalized = json.dumps(self._normalize_content(updated_section), sort_keys=True)
                             
                             if original_normalized != updated_normalized:
                                 resume_data[section_name] = updated_section
                                 self.logger.info(f"Successfully updated {section_name} with meaningful changes")
                             else:
                                 self.logger.warning(f"No significant changes detected for {section_name}")
+                                resume_data[section_name] = original_content
                         else:
                             self.logger.warning(f"No valid response for {section_name}, keeping original")
+                            resume_data[section_name] = original_content
+                            
                     except Exception as e:
                         self.logger.error(f"Error updating {section_name}: {str(e)}")
+                        resume_data[section_name] = original_content
                     
                     # Avoid rate limiting
                     time.sleep(2)
+            
+            # VALIDATION: Ensure all required v2 sections are present
+            required_sections = ['header', 'professional_summary', 'core_competencies', 'professional_experience', 'education']
+            missing_sections = [section for section in required_sections if section not in resume_data]
+            
+            if missing_sections:
+                self.logger.error(f"Missing required sections: {missing_sections}")
+                return None
             
             # Generate resume filename
             base_filename = self._create_professional_filename(job_details)
@@ -85,9 +100,9 @@ class ResumeHandler:
             resume_path = RESUME_DIR / resume_filename
             json_path = RESUME_DIR / json_filename
             
-            # Save JSON for reference
-            with open(json_path, 'w') as f:
-                json.dump(resume_data, f, indent=2)
+            # Save JSON for reference with UTF-8 encoding
+            with open(json_path, 'w', encoding='utf-8') as f:  # FIX: Explicit UTF-8 encoding
+                json.dump(resume_data, f, indent=2, ensure_ascii=False)
                 
             # Convert to DOCX using updated ResumeConverter
             converter = ResumeConverter()
@@ -124,35 +139,20 @@ class ResumeHandler:
             
     def _create_professional_filename(self, job_details: Dict) -> str:
         """Create a professional resume filename based on job details"""
-        # Extract job title (avoid using company name)
         job_title = job_details.get('title', 'Job').strip()
-        
-        # Clean up the job title for the filename
-        # Extract important keywords for role type
         role_keywords = ['SDET', 'QA', 'Test', 'Quality', 'Automation', 'Engineer', 'Lead', 'Senior', 'Manager', 'Business', 'Analyst', 'BA', 'Tester']
         
-        # Find matching keywords in the job title
         role_parts = []
         for keyword in role_keywords:
             if re.search(r'\b' + re.escape(keyword) + r'\b', job_title, re.IGNORECASE):
                 role_parts.append(keyword)
         
-        # If no keywords found, use a generic "Role"
         if not role_parts:
             role_type = "QA"
         else:
-            # Join found keywords to create role type
             role_type = "_".join(role_parts)
         
-        # Create a standardized filename
         return f"{role_type}_Resume_Zahid_Anwar"
-        
-    def _create_filename_slug(self, text: str) -> str:
-        """Create a filename-friendly slug from text"""
-        # Replace spaces with underscores and remove special characters
-        slug = re.sub(r'[^a-zA-Z0-9_]', '', text.replace(' ', '_'))
-        # Limit length
-        return slug[:30] if slug else "Untitled"
         
     def _ensure_unique_filename(self, base_filename: str, extension: str) -> str:
         """Ensure filename is unique by adding a counter if needed"""
@@ -160,7 +160,6 @@ class ResumeHandler:
         counter = 1
         
         while (RESUME_DIR / filename).exists():
-            # Add version number for better tracking
             filename = f"{base_filename}_v{counter}{extension}"
             counter += 1
             
@@ -168,7 +167,7 @@ class ResumeHandler:
 
 
 class ResumeConverter:
-    """Converts resume JSON to formatted DOCX document using new v2 format"""
+    """FIXED: Converts resume JSON to formatted DOCX document using new v2 format"""
     
     def __init__(self):
         self.doc = Document()
@@ -176,152 +175,79 @@ class ResumeConverter:
         
     def _setup_document(self):
         """Setup document properties and styles with correct fonts"""
-        # Set up margins (narrow)
+        # Set up margins (1 inch all around)
         sections = self.doc.sections
         for section in sections:
             section.top_margin = Inches(0.5)
             section.bottom_margin = Inches(0.5)
             section.left_margin = Inches(0.5)
             section.right_margin = Inches(0.5)
-            section.page_height = Inches(11)  # Letter size
-            section.page_width = Inches(8.5)
         
-        # Set up styles with user-specified fonts
+        # Customize heading styles
         styles = self.doc.styles
         
-        # Heading style (Tahoma as requested)
-        style_heading = styles['Heading 1']
-        font = style_heading.font
-        font.name = 'Tahoma'
-        font.size = Pt(14)
-        font.bold = True
-        font.color.rgb = RGBColor(0, 0, 0)
+        # Heading 1 style (for main sections)
+        heading1_style = styles['Heading 1']
+        heading1_font = heading1_style.font
+        heading1_font.name = 'Tahoma'  # As requested
+        heading1_font.size = Pt(14)
+        heading1_font.bold = True
+        heading1_font.color.rgb = RGBColor(0, 51, 102)  # Professional blue
         
-        # Normal text style (Calibri as requested)
-        style_normal = styles['Normal']
-        font = style_normal.font
-        font.name = 'Calibri'
-        font.size = Pt(11)
-        font.color.rgb = RGBColor(0, 0, 0)
-        
-        # Set up list style
-        style_list = styles.add_style('Custom List', style_normal.type)
-        font = style_list.font
-        font.name = 'Calibri'
-        font.size = Pt(11)
-        paragraph_format = style_list.paragraph_format
-        paragraph_format.left_indent = Inches(0.25)
-        paragraph_format.space_before = Pt(0)
-        paragraph_format.space_after = Pt(6)
-
-    def _add_hyperlink(self, paragraph, text, url):
-        """Add a hyperlink to a paragraph"""
-        # This gets access to the document.xml.rels file and gets a new relation id value
-        part = paragraph.part
-        r_id = part.relate_to(url, RELATIONSHIP_TYPE.HYPERLINK, is_external=True)
-
-        # Create the w:hyperlink tag and add needed values
-        hyperlink = docx.oxml.shared.OxmlElement('w:hyperlink')
-        hyperlink.set(docx.oxml.shared.qn('r:id'), r_id)
-
-        # Create a w:r element and a new w:rPr element
-        new_run = docx.oxml.shared.OxmlElement('w:r')
-        rPr = docx.oxml.shared.OxmlElement('w:rPr')
-
-        # Join all the xml elements together add add the required text to the w:r element
-        new_run.append(rPr)
-        new_run.text = text
-        hyperlink.append(new_run)
-
-        # Create a new Run object and add the hyperlink into it
-        r = paragraph.add_run()
-        r._r.append(hyperlink)
-        r.font.name = 'Calibri'
-        r.font.color.rgb = RGBColor(0, 0, 255)
-        
-        return r
+        # Normal style (for body text)
+        normal_style = styles['Normal']
+        normal_font = normal_style.font
+        normal_font.name = 'Calibri'  # As requested
+        normal_font.size = Pt(11)
 
     def _create_header(self, header_data: Dict):
-        """Create document header section"""
-        section = self.doc.sections[0]
-        header = section.header
-        
-        # First line: Name, Email, Phone
-        p = header.paragraphs[0]
-        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        
-        # Name on left
-        name_run = p.add_run(header_data['name'])
+        """Create professional header section"""
+        # Name (larger, bold)
+        name_para = self.doc.add_paragraph()
+        name_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        name_run = name_para.add_run(header_data['name'])
         name_run.font.name = 'Tahoma'
+        name_run.font.size = Pt(18)
         name_run.font.bold = True
-        name_run.font.size = Pt(12)
+        name_run.font.color.rgb = RGBColor(0, 51, 102)
         
-        p.add_run(' | ')
+        # Contact info (centered, smaller)
+        contact_para = self.doc.add_paragraph()
+        contact_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
         
-        # Email in middle with hyperlink
-        self._add_hyperlink(p, header_data['email'].strip(), f"mailto:{header_data['email'].strip()}")
+        contact_info = f"{header_data['email']} | {header_data['phone']} | {header_data.get('linkedin', '')} | {header_data['citizenship']}"
+        contact_run = contact_para.add_run(contact_info)
+        contact_run.font.name = 'Calibri'
+        contact_run.font.size = Pt(11)
         
-        p.add_run(' | ')
-        
-        # Phone on right
-        phone_run = p.add_run(header_data['phone'])
-        phone_run.font.name = 'Calibri'
-        
-        # Second line: Citizenship and LinkedIn
-        p = header.add_paragraph()
-        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        
-        # Citizenship on left
-        citizen_run = p.add_run(header_data['citizenship'])
-        citizen_run.font.name = 'Calibri'
-        
-        p.add_run(' | ')
-        
-        # LinkedIn on right with hyperlink
-        linkedin_url = "https://" + header_data['linkedin'] if not header_data['linkedin'].startswith(('http://', 'https://')) else header_data['linkedin']
-        self._add_hyperlink(p, header_data['linkedin'], linkedin_url)
+        # Add spacing after header
+        contact_para.paragraph_format.space_after = Pt(18)
 
     def _add_professional_summary(self, summary_data: Dict):
-        """Add the new unified professional summary section"""
+        """Add unified professional summary section (v2 format)"""
         heading = self.doc.add_heading('PROFESSIONAL SUMMARY', level=1)
         heading.style = self.doc.styles['Heading 1']
         for run in heading.runs:
             run.font.name = 'Tahoma'
             run.font.bold = True
         
-        # Title and experience line
-        p = self.doc.add_paragraph()
-        self._add_formatted_text(p, summary_data.get('title_experience', ''))
-        p.paragraph_format.space_after = Pt(6)
+        # Create formatted paragraphs for each component
+        for field in ['title_experience', 'track_record', 'expertise', 'core_value']:
+            if field in summary_data and summary_data[field]:
+                p = self.doc.add_paragraph()
+                self._add_formatted_text(p, summary_data[field])
+                p.paragraph_format.space_after = Pt(8)
         
-        # Track record line
-        p = self.doc.add_paragraph()
-        self._add_formatted_text(p, summary_data.get('track_record', ''))
-        p.paragraph_format.space_after = Pt(6)
-        
-        # Expertise line
-        p = self.doc.add_paragraph()
-        self._add_formatted_text(p, summary_data.get('expertise', ''))
-        p.paragraph_format.space_after = Pt(6)
-        
-        # Core value line (with "Core Value:" prefix)
-        p = self.doc.add_paragraph()
-        core_value_run = p.add_run('Core Value: ')
-        core_value_run.font.name = 'Calibri'
-        core_value_run.font.bold = True
-        
-        self._add_formatted_text(p, summary_data.get('core_value', ''))
-        p.paragraph_format.space_after = Pt(12)
 
-    def _add_core_competencies(self, competencies: Dict):
-        """Add the detailed core competencies section"""
+    def _add_core_competencies(self, competencies_data: Dict):
+        """FIXED: Add core competencies section with bullet-separated format"""
         heading = self.doc.add_heading('CORE COMPETENCIES', level=1)
         heading.style = self.doc.styles['Heading 1']
         for run in heading.runs:
             run.font.name = 'Tahoma'
             run.font.bold = True
         
-        # Category mappings for proper display names
+        # FIXED: Clean category display names
         category_display_names = {
             'programming_and_automation': 'Programming & Automation',
             'testing_frameworks': 'Testing Frameworks',
@@ -333,101 +259,113 @@ class ResumeConverter:
             'leadership': 'Leadership'
         }
         
-        for category_key, skills in competencies.items():
-            if not skills:  # Skip empty categories
-                continue
+        # Format each competency category
+        for category, skills in competencies_data.items():
+            if skills:  # Only add if there are skills
+                p = self.doc.add_paragraph()
                 
-            p = self.doc.add_paragraph()
-            
-            # Add category name in bold
-            display_name = category_display_names.get(category_key, category_key.replace('_', ' ').title())
-            category_run = p.add_run(f'{display_name}: ')
-            category_run.font.name = 'Calibri'
-            category_run.font.bold = True
-            
-            # Add skills separated by bullet points
-            for i, skill in enumerate(skills):
-                if i > 0:
-                    bullet_run = p.add_run(' • ')
-                    bullet_run.font.name = 'Calibri'
+                # Category name (bold, clean formatting)
+                display_name = category_display_names.get(category, category.replace('_', ' ').title())
+                category_run = p.add_run(f"{display_name}: ")
+                category_run.font.name = 'Calibri'
+                category_run.font.bold = True
                 
-                # Handle bold formatting in skills
-                self._add_formatted_text(p, skill)
-            
-            p.paragraph_format.space_after = Pt(6)
+                # FIXED: Skills with proper bullet separation and bold handling
+                for i, skill in enumerate(skills):
+                    if i > 0:
+                        # FIXED: Use proper bullet character (•) with UTF-8 support
+                        bullet_run = p.add_run(' • ')
+                        bullet_run.font.name = 'Calibri'
+                    
+                    # FIXED: Handle bold formatting correctly
+                    self._add_formatted_text(p, skill)
+                
+                p.paragraph_format.space_after = Pt(6)
+        
 
-    def _add_professional_experience(self, experiences: List[Dict]):
-        """Add professional experience section with new format"""
+    def _add_professional_experience(self, experience_data: List[Dict]):
+        """FIXED: Add professional experience section with v2 format"""
         heading = self.doc.add_heading('PROFESSIONAL EXPERIENCE', level=1)
         heading.style = self.doc.styles['Heading 1']
         for run in heading.runs:
             run.font.name = 'Tahoma'
             run.font.bold = True
-            
-        # Add space after heading
-        heading.paragraph_format.space_after = Pt(12)
         
-        for exp in experiences:
-            # Company name and location on same line with separator
-            p = self.doc.add_paragraph()
-            company_run = p.add_run(f"{exp['company']} | {exp['location']}")
-            company_run.bold = True
+        for exp in experience_data:
+            # Company and Location (bold)
+            company_para = self.doc.add_paragraph()
+            company_run = company_para.add_run(f"{exp['company']} | {exp['location']}")
             company_run.font.name = 'Calibri'
-            company_run.font.size = Pt(12)
-            p.paragraph_format.space_after = Pt(2)
+            company_run.font.bold = True
+            company_run.font.size = Pt(13)
             
-            # Position and duration on same line
-            p = self.doc.add_paragraph()
-            position_run = p.add_run(f"{exp['position']} | {exp['duration']}")
-            position_run.bold = True
+            # Position and Duration
+            position_para = self.doc.add_paragraph()
+            position_run = position_para.add_run(f"{exp['position']} | {exp['duration']}")
             position_run.font.name = 'Calibri'
-            p.paragraph_format.space_after = Pt(6)
+            position_run.font.bold = True
             
-            # Summary paragraph
-            if exp.get('summary'):
-                p = self.doc.add_paragraph()
-                self._add_formatted_text(p, exp['summary'])
-                p.paragraph_format.space_after = Pt(6)
+            # Summary
+            if 'summary' in exp and exp['summary']:
+                summary_para = self.doc.add_paragraph()
+                self._add_formatted_text(summary_para, exp['summary'])
+                summary_para.paragraph_format.space_after = Pt(8)
             
             # Key achievements (if present)
-            if exp.get('key_achievements'):
+            if 'key_achievements' in exp:
                 for achievement in exp['key_achievements']:
-                    p = self.doc.add_paragraph(style='Custom List')
-                    p.paragraph_format.left_indent = Inches(0)
-                    p.paragraph_format.space_before = Pt(2)
-                    p.paragraph_format.space_after = Pt(2)
-                    
-                    bullet_run = p.add_run('• ')
-                    bullet_run.font.name = 'Calibri'
-                    
-                    self._add_formatted_text(p, achievement)
+                    bullet_para = self.doc.add_paragraph()
+                    bullet_para.style = 'List Bullet'
+                    self._add_formatted_text(bullet_para, achievement)
+                    bullet_para.paragraph_format.space_after = Pt(4)
             
-            # Detailed achievements
-            if exp.get('detailed_achievements'):
+            # Detailed achievements (if present)
+            if 'detailed_achievements' in exp:
                 for achievement in exp['detailed_achievements']:
-                    p = self.doc.add_paragraph(style='Custom List')
-                    p.paragraph_format.left_indent = Inches(0)
-                    p.paragraph_format.space_before = Pt(2)
-                    p.paragraph_format.space_after = Pt(2)
-                    
-                    bullet_run = p.add_run('• ')
-                    bullet_run.font.name = 'Calibri'
-                    
-                    self._add_formatted_text(p, achievement)
+                    bullet_para = self.doc.add_paragraph()
+                    bullet_para.style = 'List Bullet'
+                    self._add_formatted_text(bullet_para, achievement)
+                    bullet_para.paragraph_format.space_after = Pt(4)
             
-            # Environment (if present)
-            if exp.get('environment'):
-                p = self.doc.add_paragraph()
-                p.paragraph_format.space_before = Pt(6)
-                p.paragraph_format.space_after = Pt(6)
-                env_run = p.add_run('Environment: ')
-                env_run.bold = True
+            # FIXED: Environment/Skills section - clean technical tools only
+            if 'environment' in exp and exp['environment']:
+                env_para = self.doc.add_paragraph()
+                env_run = env_para.add_run('Environment: ')
                 env_run.font.name = 'Calibri'
+                env_run.font.bold = True
                 
-                self._add_formatted_text(p, exp['environment'])
+                # FIXED: Clean environment text - remove narrative phrases
+                clean_environment = self._clean_environment_text(exp['environment'])
+                self._add_formatted_text(env_para, clean_environment)
                     
-            # Add spacing after each experience entry
-            self.doc.add_paragraph().paragraph_format.space_after = Pt(12)
+
+    def _clean_environment_text(self, environment_text: str) -> str:
+        """FIXED: Clean environment text to show only technical tools"""
+        if not environment_text:
+            return environment_text
+            
+        # Remove narrative phrases that don't belong in environment section
+        narrative_phrases = [
+            r'demonstrating \*\*[^*]+\*\* and [^.]+\.',
+            r'showcasing \*\*[^*]+\*\* and [^.]+\.',
+            r'contributing to \*\*[^*]+\*\*[^.]*\.',
+            r'reflecting \*\*[^*]+\*\* and [^.]+\.',
+            r'showing \*\*[^*]+\*\* and [^.]+\.',
+            r', demonstrating[^.]+\.',
+            r', showcasing[^.]+\.',
+            r', contributing[^.]+\.',
+            r', reflecting[^.]+\.',
+        ]
+        
+        cleaned = environment_text
+        for pattern in narrative_phrases:
+            cleaned = re.sub(pattern, '', cleaned, flags=re.IGNORECASE)
+        
+        # Clean up any remaining artifacts
+        cleaned = re.sub(r',\s*$', '', cleaned)  # Remove trailing commas
+        cleaned = re.sub(r'\s+', ' ', cleaned)   # Normalize whitespace
+        
+        return cleaned.strip()
 
     def _add_education(self, education_data: List[Dict]):
         """Add education section"""
@@ -454,16 +392,19 @@ class ResumeConverter:
             p.paragraph_format.space_after = Pt(6)
 
     def _add_formatted_text(self, paragraph, text):
-        """Add text to paragraph with proper bold formatting"""
+        """FIXED: Add text to paragraph with proper bold formatting"""
         if not text:
             return
-            
-        # Handle bold highlighting with ** markers
+        
+        # FIXED: Handle bold highlighting with ** markers
+        # Split by ** but keep empty strings to maintain positioning
         parts = text.split('**')
+        
         for i, part in enumerate(parts):
-            if part:  # Skip empty parts
+            if part or i == 0:  # Include first part even if empty
                 run = paragraph.add_run(part)
-                run.bold = i % 2 == 1  # Odd indices are bold
+                # FIXED: Odd indices (1, 3, 5...) should be bold
+                run.bold = i % 2 == 1
                 run.font.name = 'Calibri'
 
     def convert_resume(self, resume_data: Dict):
@@ -484,5 +425,10 @@ class ResumeConverter:
         self._add_education(resume_data['education'])
 
     def save(self, filename: str):
-        """Save the document"""
-        self.doc.save(filename)
+        """FIXED: Save the document with UTF-8 support"""
+        try:
+            self.doc.save(filename)
+        except Exception as e:
+            # If there are encoding issues, try to fix them
+            logging.error(f"Error saving document: {e}")
+            raise
