@@ -1,0 +1,63 @@
+Job Title
+
+software development engineer in test
+
+ 
+
+Top Skills Details
+
+• Bachelor’s degree in computer science engineering, or a related technical field.
+• 7+ years of experience in software testing with a strong focus on automation.
+• Proven expertise in Selenium WebDriver, Java, and Rest Assured for automation of web and API layers.
+• Experience in Workday, Salesforce test automation and Epic Healthcare workflows.
+• Hands-on experience with mobile automation tools like Perfecto and Appium 2.0.
+• Proficiency in writing and optimizing SQL queries for data validation.
+• Strong knowledge of CI/CD using GitHub Actions, Azure DevOps, and Maven.
+• Experience in Agile/Scrum environments.
+• Familiarity with EDI, QNXT systems, and healthcare domain workflows.
+• Experience in writing Excel Macros.
+• Experience working with Jira and Xray APIs to integrate and update test results programmatically.
+• Demonstrated ability to mentor and train other teams on automation frameworks and QA best practices.
+• Excellent analytical, problem-solving, and communication skills.
+• Prior experience in COE teams is a plus.
+
+ 
+
+Worksite Address
+
+1441 Crossways Blvd,Chesapeake,VA,USA,23320
+
+ 
+
+Additional Information
+
+Must have a college degree.
+
+ 
+
+Workplace Type
+
+100% Remote
+
+ 
+
+Additional Skills & Qualifications
+
+• Design and maintain scalable, reusable automation frameworks to support regression, functional, API, Mobile and basic ETL testing.
+• Develop automated test scripts using Java, Selenium WebDriver, TestNG, Appium 2.0, Perfecto Cloud, Apache POI/JXL, Log4j, and ExtentReports.
+• Implement REST and SOAP API testing using Rest Assured and validate responses in JSON and XML.
+• Leverage ODBC libraries for basic ETL testing and backend data validations.
+• Apply the Page Object Model (POM) design pattern for better code organization and maintainability.
+• Build libraries and test classes for Salesforce automation using Selenium and Apex.
+• Develop and maintain mobile test scripts using Appium 2.0 and Perfecto Mobile Cloud for both iOS and Android.
+• Write complex SQL queries for backend database validation.
+• Use Maven for dependency management and project builds.
+• Manage source code using GitHub and Azure Repos, enabling collaborative development.
+• Configure and maintain CI/CD pipelines using GitHub Actions and Azure DevOps for continuous testing.
+• Collaborate with Agile teams, actively participating in sprint planning, daily stand-ups, and retrospectives.
+• Track and manage test cases and bugs using Jira.
+• Develop and maintain Excel-based macros for data-driven testing and test data management.
+• Integrate automated test results with Jira/Xray using APIs to update test execution results and ensure traceability.
+• Coach, guide, and train other development and QA teams to adopt and leverage the test automation framework effectively.
+
+ 
