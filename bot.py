@@ -162,28 +162,134 @@ class DiceBot:
             return False
 
     def verify_login_success(self) -> bool:
-        """Verify that login was successful by checking for user name"""
+        """Verify that login was successful using multiple verification methods"""
         try:
-            # Check if we're on the home feed page
-            if "home-feed" in self.driver.current_url:
-                self.logger.info("Successfully reached home feed page")
-                
-                # Look for the user name in the dropdown to confirm login
-                try:
-                    user_dropdown = self.wait.until(
-                        EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Zahid Anwar')]"))
-                    )
-                    self.logger.info("Login verified - user name found in header")
-                    return True
-                except:
-                    self.logger.warning("On home feed but couldn't find user name - assuming login worked")
-                    return True
-            else:
-                self.logger.error(f"Login may have failed - current URL: {self.driver.current_url}")
+            current_url = self.driver.current_url
+            self.logger.info(f"Verifying login success - Current URL: {current_url}")
+            
+            # Step 1: Check if we're on a valid post-login page
+            valid_post_login_urls = ["login-landing", "home-feed", "/dashboard"]
+            
+            is_on_valid_page = any(valid_url in current_url for valid_url in valid_post_login_urls)
+            
+            if not is_on_valid_page:
+                self.logger.error(f"Not on a recognized post-login page. Current URL: {current_url}")
                 return False
+            
+            self.logger.info(f"✓ On valid post-login page: {current_url}")
+            
+            # Step 2: Check for authenticated user indicators on current page
+            auth_indicators_found = self._check_authentication_indicators()
+            
+            if auth_indicators_found:
+                self.logger.info("✓ Authentication verified via user interface elements")
+                return True
+            
+            # Step 3: If on login-landing, try navigating to jobs page to verify access
+            if "login-landing" in current_url:
+                self.logger.info("On login-landing page, navigating to jobs search to verify authentication...")
+                
+                try:
+                    # Navigate to a jobs search page
+                    test_url = "https://www.dice.com/jobs?q=Software+Engineer&countryCode=US&pageSize=20"
+                    self.driver.get(test_url)
+                    time.sleep(3)  # Wait for page to load
+                    
+                    new_url = self.driver.current_url
+                    self.logger.info(f"After navigation, current URL: {new_url}")
+                    
+                    # If we're on the jobs page and NOT redirected to login, we're authenticated
+                    if "/jobs" in new_url and "login" not in new_url.lower():
+                        self.logger.info("✓ Successfully accessed jobs page - authentication confirmed")
+                        return True
+                    elif "login" in new_url.lower():
+                        self.logger.error("✗ Redirected back to login page - authentication failed")
+                        return False
+                    else:
+                        self.logger.warning(f"Unexpected URL after navigation: {new_url}")
+                        # Check for auth indicators on this new page
+                        if self._check_authentication_indicators():
+                            self.logger.info("✓ Found authentication indicators on current page")
+                            return True
+                        
+                except Exception as e:
+                    self.logger.warning(f"Error during jobs page navigation test: {str(e)}")
+            
+            # Step 4: Final fallback - assume success if on valid post-login page
+            self.logger.info("⚠ Could not definitively verify authentication, but on valid post-login page")
+            self.logger.info("Assuming login successful - will fail gracefully if not authenticated")
+            return True
                 
         except Exception as e:
-            self.logger.error(f"Error verifying login: {str(e)}")
+            self.logger.error(f"Error in verify_login_success: {str(e)}")
+            return False
+
+    def _check_authentication_indicators(self) -> bool:
+        """Helper method to check for various authentication indicators on the page"""
+        try:
+            # List of selectors that indicate a logged-in user
+            auth_selectors = [
+                # User profile/avatar buttons
+                "button[data-testid='profile-button']",
+                "button[aria-label*='profile' i]",
+                "button[aria-label*='account' i]",
+                "[data-testid='user-menu']",
+                "[data-testid='avatar-button']",
+                
+                # User name or email displays
+                "[data-testid='user-name']",
+                "[data-testid='user-email']",
+                
+                # Navigation elements only visible when logged in
+                "nav a[href*='profile']",
+                "nav a[href*='settings']",
+                "a[href*='logout' i]",
+                "a[href*='sign-out' i]",
+                "button[aria-label*='sign out' i]",
+                
+                # Dice-specific authenticated elements
+                "div[class*='userProfile']",
+                "button[class*='profileButton']",
+                "[data-cy='user-menu']",
+                "[data-cy='profile-dropdown']"
+            ]
+            
+            for selector in auth_selectors:
+                try:
+                    elements = self.driver.find_elements(By.CSS_SELECTOR, selector)
+                    for element in elements:
+                        if element.is_displayed():
+                            self.logger.info(f"Found authentication indicator: {selector}")
+                            return True
+                except Exception as e:
+                    self.logger.debug(f"Selector {selector} check failed: {str(e)}")
+                    continue
+            
+            # Check for specific text that indicates logged-in state
+            try:
+                page_text = self.driver.page_source.lower()
+                auth_text_indicators = [
+                    "sign out",
+                    "log out",
+                    "my profile",
+                    "account settings",
+                    "saved jobs",
+                    "applications"
+                ]
+                
+                for indicator in auth_text_indicators:
+                    if indicator in page_text:
+                        self.logger.info(f"Found authentication text indicator: '{indicator}'")
+                        return True
+                        
+            except Exception as e:
+                self.logger.debug(f"Text indicator check failed: {str(e)}")
+            
+            self.logger.debug("No authentication indicators found on current page")
+            return False
+            
+        except Exception as e:
+            self.logger.error(f"Error checking authentication indicators: {str(e)}")
             return False
 
     def random_delay(self, delay_type: str):
