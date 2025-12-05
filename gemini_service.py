@@ -121,7 +121,7 @@ class GeminiService:
                 return current_content
             
             # Save the prompt for debugging
-            with open(self.debug_dir / f"{section_name}_prompt.txt", 'w') as f:
+            with open(self.debug_dir / f"{section_name}_prompt.txt", 'w', encoding='utf-8') as f:
                 f.write(prompt)
                 
             # Get response from Gemini with API key rotation
@@ -140,7 +140,7 @@ class GeminiService:
                 return current_content
             
             # Save the raw response for debugging
-            with open(self.debug_dir / f"{section_name}_response.txt", 'w') as f:
+            with open(self.debug_dir / f"{section_name}_response.txt", 'w', encoding='utf-8') as f:
                 f.write(response.text)
                 
             # Process the response based on section type (updated for v2)
@@ -152,7 +152,7 @@ class GeminiService:
                 updated_content = current_content
                 
             # Save the processed content for debugging
-            with open(self.debug_dir / f"{section_name}_processed.json", 'w') as f:
+            with open(self.debug_dir / f"{section_name}_processed.json", 'w', encoding='utf-8') as f:
                 json.dump(updated_content, f, indent=2)
             
             # Compare original and updated content
@@ -516,7 +516,7 @@ class GeminiService:
                 prompt = self._create_work_experience_prompt(job, job_details)
                 
                 # Save the prompt for debugging
-                with open(self.debug_dir / f"job_{i+1}_prompt.txt", 'w') as f:
+                with open(self.debug_dir / f"job_{i+1}_prompt.txt", 'w', encoding='utf-8') as f:
                     f.write(prompt)
                 
                 # Get response from Gemini with API key rotation
@@ -536,14 +536,14 @@ class GeminiService:
                     continue
                 
                 # Save the raw response for debugging
-                with open(self.debug_dir / f"job_{i+1}_response.txt", 'w') as f:
+                with open(self.debug_dir / f"job_{i+1}_response.txt", 'w', encoding='utf-8') as f:
                     f.write(response.text)
                 
                 # Process the response to extract the updated job (updated for v2)
                 updated_job = self._process_work_experience_response(response.text, job)
                 
                 # Save the processed job for debugging
-                with open(self.debug_dir / f"job_{i+1}_processed.json", 'w') as f:
+                with open(self.debug_dir / f"job_{i+1}_processed.json", 'w', encoding='utf-8') as f:
                     json.dump(updated_job, f, indent=2)
                 
                 result.append(updated_job)
@@ -799,7 +799,7 @@ class GeminiService:
                     return ""
                 
                 # Load the JSON data
-                with open(resume_json_path, 'r') as f:
+                with open(resume_json_path, 'r', encoding='utf-8') as f:
                     resume_data = json.load(f)
             except Exception as e:
                 self.logger.error(f"Error loading resume data: {str(e)}")
@@ -843,7 +843,7 @@ class GeminiService:
             """
 
             # Save the prompt for debugging
-            with open(self.debug_dir / "cover_letter_prompt.txt", 'w') as f:
+            with open(self.debug_dir / "cover_letter_prompt.txt", 'w', encoding='utf-8') as f:
                 f.write(prompt)
 
             # Use the API key rotation mechanism
@@ -859,7 +859,7 @@ class GeminiService:
             
             if response and hasattr(response, 'text'):
                 # Save the raw response for debugging
-                with open(self.debug_dir / "cover_letter_response.txt", 'w') as f:
+                with open(self.debug_dir / "cover_letter_response.txt", 'w', encoding='utf-8') as f:
                     f.write(response.text)
 
                 # Clean and format the cover letter
@@ -876,7 +876,7 @@ class GeminiService:
                 cover_letter = re.sub(r'\n{3,}', '\n\n', cover_letter)
                 
                 # Save the processed cover letter for debugging
-                with open(self.debug_dir / "cover_letter_processed.txt", 'w') as f:
+                with open(self.debug_dir / "cover_letter_processed.txt", 'w', encoding='utf-8') as f:
                     f.write(cover_letter)
                 
                 return cover_letter
@@ -923,7 +923,7 @@ class GeminiService:
             """
             
             # Save the prompt for debugging
-            with open(self.debug_dir / "job_description_to_json_prompt.txt", 'w') as f:
+            with open(self.debug_dir / "job_description_to_json_prompt.txt", 'w', encoding='utf-8') as f:
                 f.write(prompt)
             
             # Make API call with key rotation
@@ -942,7 +942,7 @@ class GeminiService:
                 return None
             
             # Save the raw response for debugging
-            with open(self.debug_dir / "job_description_to_json_response.txt", 'w') as f:
+            with open(self.debug_dir / "job_description_to_json_response.txt", 'w', encoding='utf-8') as f:
                 f.write(response.text)
             
             # Extract JSON from the response using our robust utility function
@@ -951,7 +951,7 @@ class GeminiService:
             if not job_json:
                 self.logger.error("Failed to extract JSON from Gemini response")
                 # Save the problematic response for debugging
-                with open(self.debug_dir / "failed_json_response.txt", 'w') as f:
+                with open(self.debug_dir / "failed_json_response.txt", 'w', encoding='utf-8') as f:
                     f.write(response.text)
                 
                 # Create a basic JSON with the job description text
@@ -975,7 +975,7 @@ class GeminiService:
                     if match:
                         skills_section = match.group(1)
                         # Extract bullet points
-                        skills_items = re.findall(r'[-•*]\s*([^\n]*)', skills_section)
+                        skills_items = re.findall(r'[-â€¢*]\s*([^\n]*)', skills_section)
                         if skills_items:
                             job_json['skills'] = [item.strip() for item in skills_items]
                             break
@@ -1039,7 +1039,7 @@ class GeminiService:
                 
                 self.logger.info("Created fallback JSON with missing fields")
                 # Save the fallback JSON for debugging
-                with open(self.debug_dir / "fallback_job_json.json", 'w') as f:
+                with open(self.debug_dir / "fallback_job_json.json", 'w', encoding='utf-8') as f:
                     json.dump(job_json, f, indent=2)
             
             # Ensure skills is a list
@@ -1054,7 +1054,7 @@ class GeminiService:
                 job_json['location'] = 'Remote'
             
             # Save the processed JSON for debugging
-            with open(self.debug_dir / "job_description_to_json_processed.json", 'w') as f:
+            with open(self.debug_dir / "job_description_to_json_processed.json", 'w', encoding='utf-8') as f:
                 json.dump(job_json, f, indent=2)
             
             return job_json
@@ -1067,7 +1067,7 @@ class GeminiService:
         """Extract a JSON object from text using multiple approaches"""
         try:
             # Save the original text for debugging
-            with open(self.debug_dir / "json_extraction_input.txt", 'w') as f:
+            with open(self.debug_dir / "json_extraction_input.txt", 'w', encoding='utf-8') as f:
                 f.write(text)
                 
             # Method 1: Try direct parsing
@@ -1226,7 +1226,7 @@ class GeminiService:
                     
             if skills_section:
                 # Extract bullet points or comma separated items
-                skills_items = re.findall(r'[-•*]\s*([^\n]*)', skills_section)
+                skills_items = re.findall(r'[-â€¢*]\s*([^\n]*)', skills_section)
                 if skills_items:
                     manual_json['skills'] = [item.strip() for item in skills_items]
                 else:
@@ -1239,7 +1239,7 @@ class GeminiService:
             manual_json['location'] = 'Remote'
             
             # Save this manual extraction for debugging
-            with open(self.debug_dir / "manual_json_extraction.json", 'w') as f:
+            with open(self.debug_dir / "manual_json_extraction.json", 'w', encoding='utf-8') as f:
                 json.dump(manual_json, f, indent=2)
                 
             if len(manual_json) >= 3:  # At least three fields found

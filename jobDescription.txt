@@ -1,17 +1,18 @@
-Job Title: SDET (Software Development Engineer in Test)
- 
-Location: Remote 
-Experience: 5–8 years
-Employment Type: Contract - 6 months to start but multi-year project 
-$50/hr on w2
-Client : Excelsoft
+Job Description Files (to test with):
 
-Required Skills and Experience
-5–8 years of experience as an SDET, QA Automation Engineer, or Test Developer.
-Strong coding skills in Java or Python for automation framework development.
-Hands-on experience with test automation tools/frameworks: Selenium, Cypress, Playwright, or REST Assured.
-Experience with API testing (Postman, REST Assured, Karate, etc.).
-Good understanding of DevOps and CI/CD pipelines — Jenkins, GitHub Actions, or AWS CodePipeline.
-Exposure to AWS services such as Lambda, ECS, CloudWatch, or S3 for test execution and reporting.
-Knowledge of database testing (SQL and NoSQL) and test data automation.
-Strong analytical and debugging skills in distributed or microservices-based environments.
+test_job_description.txt - Basic job description for "Senior Software Engineer"
+test_job_description_unicode.txt - Advanced test with many Unicode characters including:
+
+Em dashes (—)
+Bullets (•, ▸, ✓)
+Emoji (📋, 💼, 🎯, ⭐, etc.)
+Special symbols (™, ®, ©)
+And the problematic \u202f character
+
+
+
+Testing Tools:
+
+test_encoding.py - Simple test script to verify the fix
+QUICK_REFERENCE.txt - START HERE - Quick commands and overview
+TESTING_GUIDE.txt - Detailed step-by-step instructions
