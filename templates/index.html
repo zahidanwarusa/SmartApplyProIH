@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartApplyPro - AI-Powered Resume Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-robot"></i>
+                    <h1>SmartApplyPro</h1>
+                </div>
+                <p class="tagline">Your AI-Powered Career Accelerator</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            
+            <!-- Hero Section -->
+            <section class="hero">
+                <h2>Generate Tailored Resumes in Seconds</h2>
+                <p class="hero-description">Upload or paste a job description, and let our AI create a perfectly optimized resume for you.</p>
+            </section>
+
+            <!-- Progress Steps -->
+            <div class="progress-steps">
+                <div class="step active" id="step-1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Input Job Description</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step" id="step-2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Review & Confirm</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step" id="step-3">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Generate Resume</div>
+                </div>
+            </div>
+
+            <!-- Alert Messages -->
+            <div id="alert-container"></div>
+
+            <!-- Step 1: Job Description Input -->
+            <section class="card" id="input-section">
+                <h3><i class="fas fa-file-alt"></i> Step 1: Provide Job Description</h3>
+                <p class="section-description">Choose one of the following methods to input the job description:</p>
+                
+                <div class="input-methods">
+                    <!-- Method Tabs -->
+                    <div class="tab-buttons">
+                        <button class="tab-btn active" data-tab="paste">
+                            <i class="fas fa-clipboard"></i> Paste Text
+                        </button>
+                        <button class="tab-btn" data-tab="upload">
+                            <i class="fas fa-cloud-upload-alt"></i> Upload File
+                        </button>
+                    </div>
+
+                    <!-- Tab Content -->
+                    <div class="tab-content active" id="paste-tab">
+                        <form id="paste-form">
+                            <div class="form-group">
+                                <label for="job_description_text">
+                                    <i class="fas fa-paste"></i> Paste Job Description
+                                </label>
+                                <textarea 
+                                    id="job_description_text" 
+                                    name="job_description_text" 
+                                    rows="12" 
+                                    placeholder="Paste the complete job description here...
+
+Example:
+Job Title: Senior Software Engineer
+Company: TechCorp Inc.
+Location: San Francisco, CA
+
+We are looking for an experienced software engineer with expertise in...
+
+Requirements:
+- 5+ years of experience
+- Python, JavaScript, React
+- Cloud platforms (AWS/Azure)
+..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-arrow-right"></i> Process Description
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="tab-content" id="upload-tab">
+                        <form id="upload-form">
+                            <div class="form-group">
+                                <label for="job_description_file">
+                                    <i class="fas fa-file-upload"></i> Upload Job Description
+                                </label>
+                                <div class="file-upload-wrapper">
+                                    <input 
+                                        type="file" 
+                                        id="job_description_file" 
+                                        name="job_description_file" 
+                                        accept=".pdf,.docx,.txt"
+                                        style="display: none;">
+                                    <button type="button" class="btn btn-secondary" id="file-upload-btn">
+                                        <i class="fas fa-folder-open"></i> Choose File
+                                    </button>
+                                    <span id="file-name" class="file-name">No file selected</span>
+                                </div>
+                                <small class="help-text">
+                                    <i class="fas fa-info-circle"></i> 
+                                    Accepted formats: PDF, DOCX, TXT (Max 16MB)
+                                </small>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-arrow-right"></i> Process File
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 2: Review Job Details -->
+            <section class="card hidden" id="review-section">
+                <h3><i class="fas fa-eye"></i> Step 2: Review Job Requirements</h3>
+                <p class="section-description">Review the extracted information and make any necessary adjustments:</p>
+                
+                <div id="job-details" class="job-details">
+                    <!-- Job details will be dynamically inserted here -->
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" id="edit-btn">
+                        <i class="fas fa-edit"></i> Edit Details
+                    </button>
+                    <button class="btn btn-primary" id="generate-btn">
+                        <i class="fas fa-magic"></i> Generate Resume
+                    </button>
+                </div>
+            </section>
+
+            <!-- Step 3: Resume Generation -->
+            <section class="card hidden" id="result-section">
+                <h3><i class="fas fa-check-circle"></i> Step 3: Your Resume is Ready!</h3>
+                <p class="section-description">Your tailored resume has been generated successfully.</p>
+                
+                <div class="success-message">
+                    <div class="success-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h4>Resume Generated Successfully!</h4>
+                    <p>Your AI-optimized resume has been created and is ready for download.</p>
+                </div>
+
+                <div class="button-group">
+                    <a href="#" id="download-btn" class="btn btn-success" download>
+                        <i class="fas fa-download"></i> Download Resume
+                    </a>
+                    <button class="btn btn-secondary" id="start-over-btn">
+                        <i class="fas fa-redo"></i> Create Another Resume
+                    </button>
+                </div>
+            </section>
+
+            <!-- Loading Overlay -->
+            <div class="loading-overlay hidden" id="loading-overlay">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <p id="loading-text">Processing your job description...</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 SmartApplyPro. Your AI-Powered Career Accelerator.</p>
+            <p class="footer-links">
+                <a href="#"><i class="fas fa-question-circle"></i> Help</a> | 
+                <a href="#"><i class="fas fa-shield-alt"></i> Privacy</a> | 
+                <a href="#"><i class="fas fa-file-contract"></i> Terms</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

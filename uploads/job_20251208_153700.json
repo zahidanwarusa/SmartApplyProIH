@@ -1,0 +1,135 @@
+{
+  "job_title": "SmartApplyPro Web Interface - FIXED VERSION",
+  "description": "Flask application for job description input and resume generation",
+  "language": "Python",
+  "framework": "Flask",
+  "libraries_used": [
+    "os",
+    "json",
+    "logging",
+    "pathlib",
+    "datetime",
+    "flask",
+    "werkzeug.utils",
+    "PyPDF2",
+    "docx",
+    "resume_handler",
+    "gemini_service"
+  ],
+  "dependencies": [
+    {
+      "name": "Flask",
+      "version": "N/A"
+    },
+    {
+      "name": "PyPDF2",
+      "version": "N/A"
+    },
+    {
+      "name": "python-docx",
+      "version": "N/A"
+    },
+    {
+      "name": "resume_handler",
+      "description": "Custom module for resume handling",
+      "version": "N/A"
+    },
+    {
+      "name": "gemini_service",
+      "description": "Custom module for interacting with Gemini API",
+      "version": "N/A"
+    }
+  ],
+  "features": [
+    "Job description input (text paste or file upload)",
+    "File type support: PDF, DOCX, TXT",
+    "Job description parsing using Gemini AI",
+    "Structured JSON output for job details",
+    "Resume generation based on parsed job description",
+    "Resume download functionality",
+    "Error handling for file uploads and API calls",
+    "Logging for application events"
+  ],
+  "configuration": {
+    "secret_key": "your-secret-key-here-change-in-production",
+    "max_content_length": "16MB",
+    "upload_folder": "uploads",
+    "generated_resumes_folder": "data/resumes",
+    "allowed_extensions": [
+      "pdf",
+      "docx",
+      "txt"
+    ]
+  },
+  "routes": [
+    {
+      "path": "/",
+      "method": "GET",
+      "description": "Main landing page"
+    },
+    {
+      "path": "/upload",
+      "method": "POST",
+      "description": "Handle job description upload or paste",
+      "request_data_formats": [
+        "application/json",
+        "multipart/form-data",
+        "application/x-www-form-urlencoded"
+      ],
+      "response_format": "application/json",
+      "response_structure": {
+        "success": "boolean",
+        "job_id": "string (optional)",
+        "job_data": "object (optional)",
+        "message": "string (optional)",
+        "error": "string (optional)"
+      }
+    },
+    {
+      "path": "/generate-resume",
+      "method": "POST",
+      "description": "Generate optimized resume based on job description",
+      "request_data_format": "application/json",
+      "request_body_example": {
+        "job_id": "string"
+      },
+      "response_format": "application/json",
+      "response_structure": {
+        "success": "boolean",
+        "message": "string (optional)",
+        "resume_filename": "string (optional)",
+        "download_url": "string (optional)",
+        "error": "string (optional)"
+      }
+    },
+    {
+      "path": "/download/<filename>",
+      "method": "GET",
+      "description": "Download generated resume"
+    }
+  ],
+  "logging_configuration": {
+    "level": "INFO",
+    "format": "N/A"
+  },
+  "AI_integration": {
+    "service": "GeminiService",
+    "api_call_method": "make_api_call",
+    "prompt_structure": {
+      "analysis_goal": "Extract structured job description information into JSON",
+      "output_format": "JSON",
+      "fields": [
+        "title",
+        "company",
+        "location",
+        "description",
+        "requirements",
+        "skills",
+        "experience_level",
+        "job_type"
+      ],
+      "fallback_values": "\"Not specified\" or empty arrays for missing fields",
+      "output_constraint": "ONLY JSON, no additional text"
+    }
+  }
+}
