@@ -13,15 +13,15 @@ for directory in [DATA_DIR, RESUME_DIR, JOBS_DIR, TEMP_DIR]:
     directory.mkdir(parents=True, exist_ok=True)
 
 # Default resume template
-DEFAULT_RESUME = BASE_DIR / 'zahid_resume_v2.json'
+DEFAULT_RESUME = BASE_DIR / 'inam_resume_v2.json'
 if not DEFAULT_RESUME.exists():
     raise FileNotFoundError(f"Default resume template not found: {DEFAULT_RESUME}")
 
 # API Keys - Support for multiple keys with rotation
 # The system will use these keys in order and rotate when limits are reached
 GEMINI_API_KEYS = [  # Primary key
-    'AIzaSyB3g63kzoe9oKt6JxH8luvit3xS_GGIpBE',
-    'AIzaSyA3-UQ3YWkv4xuG7yC3y0eyBwRR8edCX2I',
+    'AIzaSyASoNADGrRDnTDIkzu0YcGMQ9Ae91RBTE0',
+    'AIzaSyDCr37pRZKUA3uI1PUOB4jphuCwBZnvor8',
       
       # Secondary key
     # Add more keys as needed
@@ -43,8 +43,8 @@ CHROME_PROFILE = {
 }
 
 DICE_LOGIN = {
-    'email': 'zahidsdet@gmail.com',
-    'password': 'Woodbridge@2023'
+    'email': 'ihaq5565@gmail.com',
+    'password': 'iwatchTom&Jerry@09'
 }
 
 HEADLESS_MODE = True
@@ -76,16 +76,24 @@ MAX_RETRIES = {
 }
 
 # Job Search Settings
+# Job Search Settings
 JOB_TITLES = [
-  "SDET",
-  "QA Automation",
-  "Test Automation",
-  "Senior SDET",
-  "Lead SDET",
-  "Quality Assurance Engineer",
-  "QA Engineer", 
-  "Test Engineer",
-  "Software Test Engineer",
+    "Performance Test Engineer",
+    "Performance Test Lead",
+    "Load Test Engineer",
+    "Scrum Master",
+    "QA Lead",
+    "Test Lead",
+    "Performance Stress Test Engineer",
+    "Automation Test Engineer",
+    "QA Automation Engineer",
+    "Senior QA Engineer",
+    "Technical Test Lead",
+    "Quality Assurance Lead",
+    "Agile Scrum Master",
+    "QA Team Lead",
+    "LoadRunner Engineer",
+    "Software Test Engineer"
 ]
 # Search URL template
 DICE_SEARCH_URL = "https://www.dice.com/jobs?q={}&countryCode=US&pageSize=20&filters.workplaceTypes=Remote&filters.easyApply=true&language=en"
@@ -104,22 +112,32 @@ VERIFY_APPLIED_JOBS = True  # Double-check if a job was already applied to
 
 
 # ZipRecruiter Settings
-ZIPRECRUITER_EMAIL = "zahidsdet@gmail.com"
+ZIPRECRUITER_EMAIL = "ihaq5565@gmail.com"
 ZIPRECRUITER_LOGIN_URL = "https://www.ziprecruiter.com/authn/login"
 ZIPRECRUITER_SEARCH_URL = "https://www.ziprecruiter.com/jobs-search?search={}&location=Remote+%28USA%29&refine_by_location_type=&radius=5000&days=&page={}"
 
 # ZipRecruiter Job Search Settings
 ZIPRECRUITER_JOB_TITLES = [
-    "SDET",
-    "Software Development Engineer in Test",
-    "QA Automation Engineer",
-    "Test Automation Engineer",
-    "Senior SDET",
-    "Lead SDET",
-    "Quality Assurance Automation",
-    "Software Test Engineer",
+    "Performance Test Engineer",
+    "Performance Test Lead",
+    "Load Test Engineer",
+    "Scrum Master",
+    "QA Lead",
+    "Test Lead",
+    "Performance Stress Test Engineer",
     "Automation Test Engineer",
-    "Senior QA Engineer"
+    "QA Automation Engineer",
+    "Senior QA Engineer",
+    "Senior Test Engineer",
+    "Test Automation Engineer",
+    "LoadRunner Engineer",
+    "Quality Assurance Lead",
+    "Agile Scrum Master",
+    "Technical Test Lead",
+    "QA Team Lead",
+    "Performance Testing Consultant",
+    "Software Test Engineer",
+    "Quality Engineer"
 ]
 
 # Gmail API Settings for verification codes

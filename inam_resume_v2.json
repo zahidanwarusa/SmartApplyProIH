@@ -1,0 +1,202 @@
+{
+  "header": {
+    "name": "Inam Haq",
+    "email": "ihaq5565@gmail.com",
+    "phone": "(703) 623-3650",
+    "address": "3012 American Eagle Blvd, Woodbridge, VA 22191",
+    "citizenship": "US Citizen"
+  },
+  "professional_summary": {
+    "title_experience": "**Scrum Master / Performance Test Lead** with **15+ years** of comprehensive experience in software development and testing across **Client/Server** and **Web-based applications** in **Windows** and **UNIX** environments.",
+    "track_record": "Proven track record of leading **enterprise-level migrations** (Windows Server 2016→2022, TFS→GitHub Enterprise) and implementing **automation frameworks** achieving significant efficiency gains.",
+    "expertise": "Expert in **Performance/Load Testing**, **Test Automation**, **Agile/Scrum methodologies**, and building scalable QA processes across all phases of SDLC including **Manual/Automation Testing**, **System Integration**, **End-to-End**, **Regression**, and **UAT**.",
+    "core_value": "Transform testing processes into comprehensive quality assurance strategies while leading cross-functional teams through complex technology migrations and continuous improvement initiatives."
+  },
+  "core_competencies": {
+    "test_automation_tools": ["QuickTest Professional (QTP/UFT)", "Selenium", "Subject7", "Rational Functional Tester", "Worksoft Certify", "WinRunner"],
+    "performance_testing": ["LoadRunner", "JMeter", "SAP Solution Manager", "NIPING"],
+    "programming_languages": ["SQL", "PL/SQL", "VB Script", "Java", "C#", "PowerShell"],
+    "testing_methodologies": ["Manual Testing", "Automation Testing", "Performance Testing", "Load Testing", "Stress Testing", "Integration Testing", "End-to-End Testing", "Regression Testing", "Functional Testing", "UAT", "Security Testing"],
+    "defect_management": ["HP Test Director", "Quality Center", "Azure DevOps", "Rational ClearQuest", "TFS"],
+    "version_control": ["Git", "GitHub Enterprise", "CVS", "PVCS", "StarTeam", "VSS", "Rational ClearCase"],
+    "databases": ["Microsoft SQL Server", "Oracle", "Mark Logic"],
+    "application_servers": ["Weblogic 8.1", "Tomcat Apache 7.5"],
+    "agile_scrum": ["Scrum Master", "Sprint Planning", "Product Backlog Management", "Kanban", "Sprint Retrospectives", "Fibonacci Sequencing"],
+    "cloud_devops": ["Azure DevOps", "Amazon Workspaces", "SharePoint"],
+    "methodologies": ["Agile", "Scrum", "Waterfall", "RUP"],
+    "leadership": ["Team Lead", "UAT Planning", "Test Strategy Development", "Process Implementation", "Team Training", "Stakeholder Communication"]
+  },
+  "professional_experience": [
+    {
+      "company": "FDIC",
+      "location": "Remote",
+      "position": "Scrum Master / Team Lead",
+      "duration": "September 2023 -- December 2025",
+      "summary": "Led multiple high-impact projects simultaneously while performing **Scrum Master** and **Team Lead** duties, driving **enterprise-level migrations** and implementing comprehensive **quality assurance processes** across development and production environments.",
+      "key_achievements": [
+        "Successfully led **Windows Server migration** from 2016 to 2022 for multiple applications, ensuring zero downtime and seamless transition",
+        "Orchestrated **enterprise-wide migration** from TFS to GitHub Enterprise, modernizing version control infrastructure",
+        "Implemented **automation framework architecture** using Subject7, training team members and achieving significant test execution efficiency",
+        "Maintained **Kanban board** for daily Scrums and PBI tracking, ensuring optimal team productivity and sprint velocity"
+      ],
+      "detailed_achievements": [
+        "Performed duties of **Scrum Master**, ensuring all team members have work assigned and properly prioritized by Product Owners",
+        "Led **Sprint Planning sessions** and Product Backlog LOE determination using the **Fibonacci Sequence** methodology",
+        "Conducted **Sprint Retrospectives** to identify process improvements and implement better practices, resulting in continuous team enhancement",
+        "Led comprehensive **UAT planning efforts** and assisted Product Owners with UAT Plan execution and stakeholder coordination",
+        "Generated and implemented standardized templates for **Test Plan, Test Cases, Test Scripts, and Business Analysis** documentation",
+        "Maintained overall **quality of project deliverables** and oversaw all stages of testing lifecycle across multiple projects",
+        "Led the development of **test strategy, environment design, and test data** management processes",
+        "Oversaw **integration, functional, system, regression, load, performance, and UAT testing** initiatives",
+        "Implemented **quality processes** supporting development and production change management workflows",
+        "Managed **test discrepancies** and communicated findings to appropriate stakeholders with detailed analysis",
+        "Developed comprehensive **Test Plans and Test Scenarios** from user stories using Agile best practices",
+        "Performed **security, regression, GUI, functional, usability, and backend testing** using SQL queries and various testing tools",
+        "Reported **daily test execution status** and collaborated with analysts and developers for efficient defect resolution",
+        "Managed **change requests, defects, enhancements, and documentation** using Azure DevOps and SharePoint platforms",
+        "Designed and developed **automation framework architecture** using Subject7, providing training and mentorship to team members",
+        "Performed comprehensive **Load Testing with JMeter**, analyzing system behavior under various load conditions",
+        "Documented and reported defects using **Azure DevOps** with detailed reproduction steps and supporting evidence"
+      ],
+      "environment": "Agile, Scrum, Cloud, Selenium, Subject7, JMeter, Microsoft SQL Server, SharePoint, ClearQuest, TFS, GitHub Enterprise, Azure DevOps, PowerShell, Fiddler, Windows, UNIX"
+    },
+    {
+      "company": "Bank of America",
+      "location": "Wilmington, DE",
+      "position": "Performance Test Engineer",
+      "duration": "October 2016 -- September 2023",
+      "summary": "Developed and executed comprehensive testing strategies for enterprise banking applications, specializing in **Performance Testing**, **Load Testing**, and **Test Automation** using industry-standard tools and methodologies.",
+      "key_achievements": [
+        "Implemented **automation framework** using QuickTest Pro for regression testing, significantly reducing manual testing effort",
+        "Executed comprehensive **Load Testing** using LoadRunner and JMeter, identifying and resolving critical performance bottlenecks",
+        "Conducted **Data Integrity Testing** using complex SQL queries, ensuring data accuracy across multiple systems",
+        "Developed and maintained **test automation suite** for regression testing with high code reusability"
+      ],
+      "detailed_achievements": [
+        "Developed and implemented standardized templates for **Test Plan, Test Cases, Test Scripts, and Business Analysis**",
+        "Conducted **manual testing** for entire application using structured test scripts and comprehensive test coverage",
+        "Analyzed **Business Requirements and Functional Specifications** to prepare detailed and accurate Test Cases",
+        "Developed and executed **Test Plans, Scenarios, and Scripts** for Functional, Regression, and Integration testing",
+        "Performed **Security, GUI, Functional, Usability, and Backend Testing** using SQL queries to validate business logic",
+        "Conducted comprehensive **Data Integrity Testing** using SQL queries to ensure data consistency across systems",
+        "Managed **change requests and documentation** using ClearCase and ClearQuest for version control and defect tracking",
+        "Automated test cases for **regression testing** using QuickTest Pro (QTP) with VBScript",
+        "Executed **Load Testing** using LoadRunner and JMeter to validate system performance under various load conditions",
+        "Reported defects with **supporting evidence and reproduction steps** using ClearQuest for efficient resolution"
+      ],
+      "environment": "QTP, LoadRunner, ClearCase, ClearQuest, TestManager, RUP, RequisitePro, Windows, UNIX"
+    },
+    {
+      "company": "Accenture Federal",
+      "location": "Falls Church, VA",
+      "position": "Performance Stress Test (PST) Consultant",
+      "duration": "January 2015 -- September 2016",
+      "summary": "Designed and implemented comprehensive **performance test plans** and validated system performance through automated test development for enterprise SAP implementations.",
+      "key_achievements": [
+        "Improved **performance test architecture** and provided critical support to release engineering teams",
+        "Implemented **SAP Solution Manager and NIPING tools** for network monitoring and performance tuning",
+        "Produced comprehensive **performance graphs, reports, and recommendations** for stakeholders",
+        "Measured system **CPU, memory, and DB performance** for optimization initiatives"
+      ],
+      "detailed_achievements": [
+        "Designed and implemented comprehensive **performance test plans** aligned with business requirements",
+        "Validated system performance via **automated test development** using LoadRunner and custom scripts",
+        "Improved **performance test architecture** to support scalable and maintainable test frameworks",
+        "Provided ongoing support to **release engineering teams** for performance validation",
+        "Measured and analyzed system **CPU, memory, and database performance** for optimization recommendations",
+        "Developed and executed **load test scripts and VuGen scripts** using LoadRunner for SAP applications",
+        "Produced detailed **performance graphs, reports, and recommendations** for technical and business stakeholders",
+        "Implemented **SAP Solution Manager and NIPING tools** for comprehensive network monitoring and performance tuning"
+      ],
+      "environment": "Windows, Apache, Tomcat, Citrix, SAP, HANA, Solution Manager, Business Objects, LoadRunner, C#, VB Script, Java, JSP, HTTPS, XML"
+    },
+    {
+      "company": "Accenture Federal",
+      "location": "Reston, VA",
+      "position": "Performance Stress Test (PST) Consultant",
+      "duration": "March 2014 -- January 2015",
+      "summary": "Collected workflows, developed test plans, and executed comprehensive **performance testing** using LoadRunner while establishing **automation frameworks** using Worksoft Certify.",
+      "key_achievements": [
+        "Supported deployments with **peak load simulations of 900K+ concurrent users**, validating system scalability",
+        "Implemented **Worksoft Certify-based automation frameworks** for large-scale regression testing",
+        "Established **remote automation labs on Amazon Workspaces**, enabling distributed testing capabilities",
+        "Developed **data-driven regression suites** improving test coverage and efficiency"
+      ],
+      "detailed_achievements": [
+        "Collected comprehensive workflows from business stakeholders and SMEs for test scenario development",
+        "Developed detailed **test plans and test strategies** for performance and functional testing initiatives",
+        "Executed comprehensive **performance testing using LoadRunner**, analyzing results and providing optimization recommendations",
+        "Created advanced **VuGen scripts** with complex business logic and transaction validation",
+        "Analyzed **performance metrics** including response times, throughput, and resource utilization",
+        "Implemented **Worksoft Certify-based automation frameworks** for enterprise application testing",
+        "Developed comprehensive **data-driven regression suites** using Worksoft Certify",
+        "Established **remote automation labs on Amazon Workspaces** for distributed team collaboration",
+        "Trained **QA teams** on automation best practices and framework utilization",
+        "Supported production deployments with **peak load simulations of 900K+ concurrent users**"
+      ],
+      "environment": "Windows, Worksoft Certify, QuickTest Pro, Quality Center, Mark Logic, VB Script, Java, HTTPS, XML"
+    },
+    {
+      "company": "CGI Federal",
+      "location": "Herndon, VA",
+      "position": "Automation Test Script Developer",
+      "duration": "July 2013 -- February 2014",
+      "summary": "Reviewed automation testing artifacts, designed and developed automated tests in **QTP** across multiple architectural layers, and mentored new automation developers.",
+      "key_achievements": [
+        "Designed and developed **automated tests in QTP** across multiple architectural layers including UI, API, and database",
+        "Collaborated with cross-functional teams to **scope automation engagements** and standardize frameworks",
+        "Mentored **new automation developers** on best practices and framework utilization",
+        "Supported **production deployments** with comprehensive automated regression testing"
+      ],
+      "detailed_achievements": [
+        "Reviewed **automation testing artifacts** and provided constructive feedback to ensure code quality and maintainability",
+        "Designed and developed comprehensive **automated tests in QTP** across UI, middleware, and database layers",
+        "Collaborated with development, business analysis, and architecture teams to **scope automation engagements**",
+        "Standardized **automation frameworks** for consistency and reusability across projects",
+        "Mentored and trained **new automation developers** on QTP, VBScript, and testing best practices",
+        "Supported **production deployments** with automated regression testing and smoke tests",
+        "Developed **reusable test components and libraries** for improved test maintenance"
+      ],
+      "environment": "Windows, QuickTest Pro, Quality Center, Mark Logic, BRMS, VB Script, Java, JSP, HTTPS, XML"
+    },
+    {
+      "company": "AMERICAN SYSTEMS",
+      "location": "Chantilly, VA",
+      "position": "Automation Test Engineer",
+      "duration": "January 2010 -- January 2013",
+      "summary": "Developed Virtual User scripts using **VuGen and Rational Functional Tester**, performed backend testing, and created large-scale test data for comprehensive testing initiatives.",
+      "key_achievements": [
+        "Developed **Virtual User scripts** using VuGen and Rational Functional Tester for performance testing",
+        "Performed comprehensive **backend testing** with SQL Server and Oracle databases",
+        "Created **large-scale test data** and developed Requirements Traceability Matrices (RTMs)",
+        "Collaborated with developers and DBAs to **identify root causes** and improve release quality"
+      ],
+      "detailed_achievements": [
+        "Developed comprehensive **Virtual User scripts** using VuGen for LoadRunner performance testing",
+        "Created automated test scripts using **Rational Functional Tester** for functional and regression testing",
+        "Performed extensive **backend testing** with SQL Server and Oracle databases using complex queries",
+        "Created **large-scale test data** to support various testing scenarios and edge cases",
+        "Developed and maintained **Requirements Traceability Matrices (RTMs)** ensuring complete test coverage",
+        "Maintained comprehensive **project documentation** including test plans, test cases, and test reports",
+        "Used **TFS and SharePoint** for test management, defect tracking, and team collaboration",
+        "Collaborated closely with **developers and DBAs** to identify root causes of defects and improve overall release quality",
+        "Participated in code reviews and provided feedback on testability of new features"
+      ],
+      "environment": "Windows, QuickTest Pro, Quality Manager, SharePoint, MS SQL Server, VB Script, Java, JSP, HTTPS, XML"
+    }
+  ],
+  "education": [
+    {
+      "degree": "Bachelor of Computer Science",
+      "major": "Computer Science",
+      "university": "",
+      "year": ""
+    },
+    {
+      "degree": "MCSE",
+      "major": "Microsoft Certified Systems Engineer",
+      "university": "Microsoft",
+      "year": "2000"
+    }
+  ]
+}

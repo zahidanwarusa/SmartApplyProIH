@@ -140,7 +140,14 @@ class ResumeHandler:
     def _create_professional_filename(self, job_details: Dict) -> str:
         """Create a professional resume filename based on job details"""
         job_title = job_details.get('title', 'Job').strip()
-        role_keywords = ['SDET', 'QA', 'Test', 'Quality', 'Automation', 'Engineer', 'Lead', 'Senior', 'Manager', 'Business', 'Analyst', 'BA', 'Tester']
+        
+        # UPDATED: Role keywords for Inam Haq's profile
+        role_keywords = [
+            'Performance', 'Load', 'Stress', 'Scrum Master', 'Scrum', 
+            'QA', 'Test', 'Quality', 'Automation', 'Engineer', 
+            'Lead', 'Senior', 'LoadRunner', 'JMeter', 'Technical',
+            'Team Lead', 'Agile', 'Manager'
+        ]
         
         role_parts = []
         for keyword in role_keywords:
@@ -152,7 +159,8 @@ class ResumeHandler:
         else:
             role_type = "_".join(role_parts)
         
-        return f"{role_type}_Resume_Zahid_Anwar"
+        # UPDATED: Changed to Inam_Haq
+        return f"{role_type}_Resume_Inam_Haq"
         
     def _ensure_unique_filename(self, base_filename: str, extension: str) -> str:
         """Ensure filename is unique by adding a counter if needed"""
@@ -256,7 +264,17 @@ class ResumeConverter:
             'quality_tools': 'Quality Tools',
             'databases': 'Databases',
             'domain_expertise': 'Domain Expertise',
-            'leadership': 'Leadership'
+            'leadership': 'Leadership',
+            'test_automation_tools': 'Test Automation Tools',
+            'performance_testing': 'Performance Testing',
+            'programming_languages': 'Programming Languages',
+            'testing_methodologies': 'Testing Methodologies',
+            'defect_management': 'Defect Management',
+            'version_control': 'Version Control',
+            'application_servers': 'Application Servers',
+            'agile_scrum': 'Agile & Scrum',
+            'cloud_devops': 'Cloud & DevOps',
+            'methodologies': 'Methodologies'
         }
         
         # Format each competency category
