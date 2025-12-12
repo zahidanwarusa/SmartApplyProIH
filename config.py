@@ -20,8 +20,8 @@ if not DEFAULT_RESUME.exists():
 # API Keys - Support for multiple keys with rotation
 # The system will use these keys in order and rotate when limits are reached
 GEMINI_API_KEYS = [  # Primary key
-    'AIzaSyC3_gE3fDre5bwUBs7DwgGklHDHgRi51qo',
-    'AIzaSyCsrDGXH_gL2ZNhX_fcNaS3mL73WwAq5hI',
+    'AIzaSyASoNADGrRDnTDIkzu0YcGMQ9Ae91RBTE0',
+    'AIzaSyDCr37pRZKUA3uI1PUOB4jphuCwBZnvor8',
       
       # Secondary key
     # Add more keys as needed
