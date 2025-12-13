@@ -1,11 +1,11 @@
 {
   "status": "running",
-  "last_updated": "2025-12-13T09:16:59.310449",
-  "total_applications": 18,
+  "last_updated": "2025-12-13T12:11:38.300871",
+  "total_applications": 19,
   "successful_applications": 0,
   "failed_applications": 2,
-  "current_job": "Applying to QA ENGINEER at ",
-  "uptime_start": "2025-12-13T09:01:21.989788",
+  "current_job": "Reviewing job: Senior Salesforce QA engineer at ",
+  "uptime_start": "2025-12-13T11:52:16.702761",
   "errors": [
     {
       "message": "No success confirmation for ",
