@@ -238,5 +238,15 @@
     "applied_date": "2025-12-13T12:17:02.879717",
     "notes": "Already applied (discovered on job details page)",
     "timestamp": "2025-12-13T12:17:02.879717"
+  },
+  "cd333658-d768-44ae-b47c-5e0b3fce6b05": {
+    "company": "",
+    "position": "Data Governance Engineer",
+    "status": "skipped",
+    "job_url": "https://www.dice.com/job-detail/cd333658-d768-44ae-b47c-5e0b3fce6b05",
+    "location": "Remote or Hybrid in Houston, Texas",
+    "applied_date": "2025-12-13T12:17:57.613022",
+    "notes": "Already applied (discovered on job details page)",
+    "timestamp": "2025-12-13T12:17:57.613022"
   }
 }

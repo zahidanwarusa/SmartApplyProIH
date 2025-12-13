@@ -1,10 +1,10 @@
 {
   "status": "running",
-  "last_updated": "2025-12-13T12:17:02.894106",
-  "total_applications": 24,
+  "last_updated": "2025-12-13T12:17:57.630060",
+  "total_applications": 25,
   "successful_applications": 0,
   "failed_applications": 2,
-  "current_job": "Reviewing job: Delphi Developer at ",
+  "current_job": "Reviewing job: Data Governance Engineer at ",
   "uptime_start": "2025-12-13T11:52:16.702761",
   "errors": [
     {
