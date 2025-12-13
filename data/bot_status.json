@@ -1,0 +1,15 @@
+{
+  "status": "idle",
+  "last_updated": "2025-12-13T08:34:50.206480",
+  "total_applications": 12,
+  "successful_applications": 0,
+  "failed_applications": 1,
+  "current_job": null,
+  "uptime_start": null,
+  "errors": [
+    {
+      "message": "No success confirmation for ",
+      "timestamp": "2025-12-13T07:46:34.019009"
+    }
+  ]
+}

@@ -1,387 +1,267 @@
-"""
-SmartApplyPro Web Interface - FIXED VERSION
-Flask application for job description input and resume generation
-"""
-
+from flask import Flask, render_template, jsonify, request
+from flask_cors import CORS
 import os
 import json
-import logging
-from pathlib import Path
 from datetime import datetime
-from flask import Flask, render_template, request, jsonify, send_file, flash, redirect, url_for
-from werkzeug.utils import secure_filename
-import PyPDF2
-from docx import Document as DocxDocument
+import threading
+import time
+from pathlib import Path
 
-# Import your existing modules
-from resume_handler import ResumeHandler
-from gemini_service import GeminiService
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-# Initialize Flask app
 app = Flask(__name__)
-app.secret_key = 'your-secret-key-here-change-in-production'
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
-app.config['UPLOAD_FOLDER'] = Path('uploads')
-app.config['GENERATED_RESUMES_FOLDER'] = Path('data/resumes')
+CORS(app)
 
-# Create necessary directories
-app.config['UPLOAD_FOLDER'].mkdir(exist_ok=True)
-app.config['GENERATED_RESUMES_FOLDER'].mkdir(parents=True, exist_ok=True)
+# Configuration
+BASE_DIR = Path(__file__).parent
+LOGS_DIR = BASE_DIR / 'logs'
+DATA_DIR = BASE_DIR / 'data'
+TRACKING_FILE = DATA_DIR / 'applications_tracking.json'
+STATUS_FILE = DATA_DIR / 'bot_status.json'
 
-# Allowed file extensions
-ALLOWED_EXTENSIONS = {'pdf', 'docx', 'txt'}
+# Ensure directories exist
+LOGS_DIR.mkdir(exist_ok=True)
+DATA_DIR.mkdir(exist_ok=True)
 
-# Initialize services
-resume_handler = ResumeHandler()
-gemini_service = GeminiService()
+# Initialize status file if it doesn't exist
+if not STATUS_FILE.exists():
+    initial_status = {
+        'status': 'idle',
+        'last_updated': datetime.now().isoformat(),
+        'total_applications': 0,
+        'successful_applications': 0,
+        'failed_applications': 0,
+        'current_job': None,
+        'uptime_start': None,
+        'errors': []
+    }
+    with open(STATUS_FILE, 'w') as f:
+        json.dump(initial_status, f, indent=2)
 
 
-def allowed_file(filename):
-    """Check if file extension is allowed"""
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-
-def extract_text_from_pdf(file_path):
-    """Extract text from PDF file"""
+def read_status():
+    """Read current bot status"""
     try:
-        with open(file_path, 'rb') as file:
-            pdf_reader = PyPDF2.PdfReader(file)
-            text = ""
-            for page in pdf_reader.pages:
-                text += page.extract_text()
-            return text
+        if STATUS_FILE.exists():
+            with open(STATUS_FILE, 'r') as f:
+                return json.load(f)
+        return {}
     except Exception as e:
-        logger.error(f"Error extracting PDF text: {str(e)}")
-        return None
+        return {'error': str(e)}
 
 
-def extract_text_from_docx(file_path):
-    """Extract text from DOCX file"""
+def read_tracking_data():
+    """Read applications tracking data"""
     try:
-        doc = DocxDocument(file_path)
-        text = "\n".join([paragraph.text for paragraph in doc.paragraphs])
-        return text
+        if TRACKING_FILE.exists():
+            with open(TRACKING_FILE, 'r') as f:
+                return json.load(f)
+        return {}
     except Exception as e:
-        logger.error(f"Error extracting DOCX text: {str(e)}")
-        return None
+        return {'error': str(e)}
 
 
-def extract_text_from_txt(file_path):
-    """Extract text from TXT file"""
+def get_recent_logs(log_file='bot.log', lines=100):
+    """Read recent log entries"""
     try:
-        with open(file_path, 'r', encoding='utf-8') as file:
-            return file.read()
+        log_path = LOGS_DIR / log_file
+        if log_path.exists():
+            with open(log_path, 'r') as f:
+                all_lines = f.readlines()
+                return all_lines[-lines:]
+        return []
     except Exception as e:
-        logger.error(f"Error reading TXT file: {str(e)}")
-        return None
+        return [f"Error reading logs: {str(e)}"]
 
 
-def call_gemini_api(prompt):
-    """
-    Wrapper function to call Gemini API using your GeminiService's make_api_call method
-    """
+def get_log_files():
+    """Get list of available log files"""
     try:
-        # Your GeminiService uses make_api_call() method
-        response = gemini_service.make_api_call(
-            prompt,
-            max_retries=2
-        )
-        
-        if response and hasattr(response, 'text'):
-            return response.text
-        else:
-            logger.error("No valid response from Gemini API")
-            return None
+        if LOGS_DIR.exists():
+            return [f.name for f in LOGS_DIR.iterdir() if f.is_file() and f.suffix == '.log']
+        return []
     except Exception as e:
-        logger.error(f"Error calling Gemini API: {str(e)}")
-        raise
+        return []
 
 
-def parse_job_description(text):
-    """Parse job description text and extract key information using Gemini AI"""
-    try:
-        logger.info(f"Parsing job description (length: {len(text)} chars)")
-        
-        prompt = f"""
-        Analyze this job description and extract structured information in JSON format:
-        
-        Job Description:
-        {text}
-        
-        Please provide a JSON response with the following structure:
-        {{
-            "title": "Job Title",
-            "company": "Company Name",
-            "location": "Location",
-            "description": "Full job description",
-            "requirements": ["requirement1", "requirement2", ...],
-            "skills": ["skill1", "skill2", ...],
-            "experience_level": "Entry/Mid/Senior level",
-            "job_type": "Full-time/Part-time/Contract"
-        }}
-        
-        Extract as much information as possible. If certain fields are not available, use "Not specified" or empty arrays.
-        Return ONLY the JSON, no additional text.
-        """
-        
-        logger.info("Calling Gemini API...")
-        response = call_gemini_api(prompt)
-        logger.info(f"Received response from Gemini")
-        
-        # Convert response to string if needed
-        response_text = str(response).strip()
-        logger.info(f"Response text length: {len(response_text)}")
-        
-        # Clean the response to ensure it's valid JSON
-        if response_text.startswith('```json'):
-            response_text = response_text[7:]
-        if response_text.startswith('```'):
-            response_text = response_text[3:]
-        if response_text.endswith('```'):
-            response_text = response_text[:-3]
-        response_text = response_text.strip()
-        
-        logger.info("Attempting to parse JSON...")
-        job_data = json.loads(response_text)
-        logger.info(f"Successfully parsed JSON with {len(job_data)} fields")
-        
-        return job_data
-        
-    except json.JSONDecodeError as e:
-        logger.error(f"JSON decode error: {str(e)}")
-        logger.error(f"Response text (first 500 chars): {response_text[:500]}")
-        return None
-    except Exception as e:
-        logger.error(f"Error parsing job description: {str(e)}")
-        import traceback
-        logger.error(traceback.format_exc())
-        return None
+def calculate_statistics():
+    """Calculate application statistics"""
+    tracking_data = read_tracking_data()
+    status = read_status()
+    
+    stats = {
+        'total_applications': len(tracking_data),
+        'successful': sum(1 for app in tracking_data.values() if app.get('status') == 'success'),
+        'failed': sum(1 for app in tracking_data.values() if app.get('status') == 'failed'),
+        'pending': sum(1 for app in tracking_data.values() if app.get('status') == 'pending'),
+        'today': 0,
+        'this_week': 0,
+        'bot_status': status.get('status', 'unknown'),
+        'last_activity': status.get('last_updated', 'N/A')
+    }
+    
+    # Calculate today's and this week's applications
+    today = datetime.now().date()
+    for app in tracking_data.values():
+        app_date_str = app.get('applied_date', app.get('timestamp', ''))
+        if app_date_str:
+            try:
+                app_date = datetime.fromisoformat(app_date_str.replace('Z', '+00:00')).date()
+                if app_date == today:
+                    stats['today'] += 1
+                if (today - app_date).days <= 7:
+                    stats['this_week'] += 1
+            except:
+                pass
+    
+    return stats
 
 
 @app.route('/')
-def index():
-    """Main landing page"""
-    return render_template('index.html')
+def dashboard():
+    """Main dashboard page"""
+    return render_template('dashboard.html')
 
 
-@app.route('/upload', methods=['POST'])
-def upload_job_description():
-    """Handle job description upload or paste"""
-    try:
-        job_description_text = None
-        
-        logger.info(f"=== Upload Request Received ===")
-        logger.info(f"Content-Type: {request.content_type}")
-        logger.info(f"Is JSON: {request.is_json}")
-        logger.info(f"Form keys: {list(request.form.keys())}")
-        logger.info(f"Files keys: {list(request.files.keys())}")
-        
-        # Handle JSON data (from JavaScript fetch)
-        if request.is_json:
-            data = request.get_json()
-            logger.info(f"JSON data received: {list(data.keys()) if data else 'None'}")
-            if data and 'job_description_text' in data:
-                job_description_text = data.get('job_description_text', '').strip()
-                if job_description_text:
-                    logger.info(f"✅ Processing pasted job description (JSON) - Length: {len(job_description_text)}")
-                else:
-                    logger.warning("❌ job_description_text is empty in JSON")
-        
-        # Handle form data (traditional form submission)
-        elif 'job_description_text' in request.form:
-            job_description_text = request.form.get('job_description_text', '').strip()
-            if job_description_text:
-                logger.info(f"✅ Processing pasted job description (Form) - Length: {len(job_description_text)}")
-            else:
-                logger.warning("❌ job_description_text is empty in Form")
-        
-        # Check if file was uploaded
-        elif 'job_description_file' in request.files:
-            file = request.files['job_description_file']
-            logger.info(f"File received: {file.filename if file else 'None'}")
-            if file and file.filename and allowed_file(file.filename):
-                filename = secure_filename(file.filename)
-                file_path = app.config['UPLOAD_FOLDER'] / filename
-                file.save(file_path)
-                logger.info(f"File saved to: {file_path}")
-                
-                # Extract text based on file type
-                ext = filename.rsplit('.', 1)[1].lower()
-                logger.info(f"Extracting text from {ext} file...")
-                
-                if ext == 'pdf':
-                    job_description_text = extract_text_from_pdf(file_path)
-                elif ext == 'docx':
-                    job_description_text = extract_text_from_docx(file_path)
-                elif ext == 'txt':
-                    job_description_text = extract_text_from_txt(file_path)
-                
-                if job_description_text:
-                    logger.info(f"✅ Extracted text length: {len(job_description_text)}")
-                else:
-                    logger.error("❌ Failed to extract text from file")
-                
-                # Clean up uploaded file
-                try:
-                    file_path.unlink()
-                    logger.info("Temporary file cleaned up")
-                except:
-                    pass
-            else:
-                logger.warning(f"Invalid or missing file: {file.filename if file else 'None'}")
-        else:
-            logger.warning("No data received in request")
-        
-        if not job_description_text:
-            logger.error("❌ No job description text found")
-            return jsonify({
-                'success': False,
-                'error': 'No job description provided. Please paste text or upload a file.'
-            }), 400
-        
-        # Parse job description using AI
-        logger.info("Parsing job description with AI...")
-        job_data = parse_job_description(job_description_text)
-        
-        if not job_data:
-            logger.error("❌ Failed to parse job description")
-            return jsonify({
-                'success': False,
-                'error': 'Failed to parse job description. Please try again.'
-            }), 500
-        
-        # Store job data in session or temporary storage
-        job_id = datetime.now().strftime("%Y%m%d_%H%M%S")
-        job_file_path = app.config['UPLOAD_FOLDER'] / f"job_{job_id}.json"
-        
-        with open(job_file_path, 'w', encoding='utf-8') as f:
-            json.dump(job_data, f, indent=2)
-        
-        logger.info(f"✅ Successfully processed job description. Job ID: {job_id}")
-        
-        return jsonify({
-            'success': True,
-            'job_id': job_id,
-            'job_data': job_data,
-            'message': 'Job description processed successfully!'
-        })
-        
-    except Exception as e:
-        logger.error(f"❌ Error in upload_job_description: {str(e)}")
-        import traceback
-        logger.error(traceback.format_exc())
-        return jsonify({
-            'success': False,
-            'error': f'An error occurred: {str(e)}'
-        }), 500
+@app.route('/logs')
+def logs_page():
+    """Logs viewer page"""
+    log_files = get_log_files()
+    return render_template('logs.html', log_files=log_files)
 
 
-@app.route('/generate-resume', methods=['POST'])
-def generate_resume():
-    """Generate optimized resume based on job description"""
-    try:
-        data = request.get_json()
-        job_id = data.get('job_id')
-        
-        if not job_id:
-            return jsonify({
-                'success': False,
-                'error': 'Job ID is required'
-            }), 400
-        
-        # Load job data
-        job_file_path = app.config['UPLOAD_FOLDER'] / f"job_{job_id}.json"
-        
-        if not job_file_path.exists():
-            return jsonify({
-                'success': False,
-                'error': 'Job data not found'
-            }), 404
-        
-        with open(job_file_path, 'r', encoding='utf-8') as f:
-            job_data = json.load(f)
-        
-        logger.info(f"Generating resume for job: {job_data.get('title', 'Unknown')}")
-        
-        # Generate resume using existing resume handler
-        resume_path = resume_handler.generate_resume(job_data)
-        
-        if not resume_path:
-            return jsonify({
-                'success': False,
-                'error': 'Failed to generate resume. Please check logs.'
-            }), 500
-        
-        # Get relative path for download
-        resume_filename = Path(resume_path).name
-        
-        return jsonify({
-            'success': True,
-            'message': 'Resume generated successfully!',
-            'resume_filename': resume_filename,
-            'download_url': url_for('download_resume', filename=resume_filename)
-        })
-        
-    except Exception as e:
-        logger.error(f"Error generating resume: {str(e)}")
-        return jsonify({
-            'success': False,
-            'error': f'An error occurred: {str(e)}'
-        }), 500
+@app.route('/applications')
+def applications_page():
+    """Applications history page"""
+    return render_template('applications.html')
 
 
-@app.route('/download/<filename>')
-def download_resume(filename):
-    """Download generated resume"""
-    try:
-        file_path = app.config['GENERATED_RESUMES_FOLDER'] / filename
-        
-        if not file_path.exists():
-            flash('Resume file not found', 'error')
-            return redirect(url_for('index'))
-        
-        return send_file(
-            file_path,
-            as_attachment=True,
-            download_name=filename,
-            mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-        )
-        
-    except Exception as e:
-        logger.error(f"Error downloading resume: {str(e)}")
-        flash(f'Error downloading resume: {str(e)}', 'error')
-        return redirect(url_for('index'))
-
-
-@app.errorhandler(413)
-def request_entity_too_large(error):
-    """Handle file too large error"""
+@app.route('/api/status')
+def api_status():
+    """API endpoint for bot status"""
+    status = read_status()
+    stats = calculate_statistics()
+    
+    # Calculate uptime if bot is running
+    uptime = None
+    if status.get('uptime_start'):
+        try:
+            start_time = datetime.fromisoformat(status['uptime_start'])
+            uptime_seconds = (datetime.now() - start_time).total_seconds()
+            hours = int(uptime_seconds // 3600)
+            minutes = int((uptime_seconds % 3600) // 60)
+            uptime = f"{hours}h {minutes}m"
+        except:
+            pass
+    
     return jsonify({
-        'success': False,
-        'error': 'File too large. Maximum size is 16MB.'
-    }), 413
+        'status': status,
+        'statistics': stats,
+        'uptime': uptime
+    })
 
 
-@app.errorhandler(500)
-def internal_server_error(error):
-    """Handle internal server errors"""
-    logger.error(f"Internal server error: {str(error)}")
+@app.route('/api/logs')
+def api_logs():
+    """API endpoint for logs"""
+    log_file = request.args.get('file', 'bot.log')
+    lines = int(request.args.get('lines', 100))
+    
+    logs = get_recent_logs(log_file, lines)
+    
     return jsonify({
-        'success': False,
-        'error': 'An internal server error occurred. Please try again.'
-    }), 500
+        'logs': logs,
+        'file': log_file,
+        'total_lines': len(logs)
+    })
+
+
+@app.route('/api/applications')
+def api_applications():
+    """API endpoint for applications data"""
+    tracking_data = read_tracking_data()
+    
+    # Convert to list and sort by date
+    applications = []
+    for job_id, app_data in tracking_data.items():
+        app_data['job_id'] = job_id
+        applications.append(app_data)
+    
+    # Sort by timestamp (newest first)
+    applications.sort(key=lambda x: x.get('timestamp', x.get('applied_date', '')), reverse=True)
+    
+    # Pagination
+    page = int(request.args.get('page', 1))
+    per_page = int(request.args.get('per_page', 20))
+    
+    start_idx = (page - 1) * per_page
+    end_idx = start_idx + per_page
+    
+    return jsonify({
+        'applications': applications[start_idx:end_idx],
+        'total': len(applications),
+        'page': page,
+        'per_page': per_page,
+        'total_pages': (len(applications) + per_page - 1) // per_page
+    })
+
+
+@app.route('/api/control/<action>', methods=['POST'])
+def api_control(action):
+    """API endpoint for bot control (start/stop/pause)"""
+    # This is a placeholder - you'll need to integrate with your actual bot control
+    status = read_status()
+    
+    if action == 'start':
+        status['status'] = 'running'
+        status['uptime_start'] = datetime.now().isoformat()
+    elif action == 'stop':
+        status['status'] = 'idle'
+        status['uptime_start'] = None
+    elif action == 'pause':
+        status['status'] = 'paused'
+    
+    status['last_updated'] = datetime.now().isoformat()
+    
+    with open(STATUS_FILE, 'w') as f:
+        json.dump(status, f, indent=2)
+    
+    return jsonify({'success': True, 'status': status})
+
+
+@app.route('/api/clear_logs', methods=['POST'])
+def api_clear_logs():
+    """API endpoint to clear log files"""
+    log_file = request.json.get('file', 'bot.log')
+    
+    try:
+        log_path = LOGS_DIR / log_file
+        if log_path.exists():
+            with open(log_path, 'w') as f:
+                f.write(f"Log cleared at {datetime.now().isoformat()}\n")
+            return jsonify({'success': True, 'message': f'{log_file} cleared'})
+        return jsonify({'success': False, 'message': 'Log file not found'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)})
+
+
+@app.route('/api/export_data')
+def api_export_data():
+    """API endpoint to export application data"""
+    tracking_data = read_tracking_data()
+    
+    return jsonify({
+        'success': True,
+        'data': tracking_data,
+        'exported_at': datetime.now().isoformat()
+    })
 
 
 if __name__ == '__main__':
-    print("\n" + "="*60)
-    print("SmartApplyPro Web Interface Starting...")
-    print("="*60)
-    print(f"Upload folder: {app.config['UPLOAD_FOLDER']}")
-    print(f"Resume folder: {app.config['GENERATED_RESUMES_FOLDER']}")
-    print("\nServer will start on: http://localhost:5000")
-    print("="*60 + "\n")
+    print("=" * 60)
+    print("SmartApplyPro Dashboard Starting...")
+    print("=" * 60)
+    print(f"Dashboard URL: http://localhost:5000")
+    print(f"Logs Directory: {LOGS_DIR}")
+    print(f"Data Directory: {DATA_DIR}")
+    print("=" * 60)
+    
     app.run(debug=True, host='0.0.0.0', port=5000)
