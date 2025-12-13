@@ -6,6 +6,10 @@ from datetime import datetime
 import threading
 import time
 from pathlib import Path
+import sys
+
+# Import bot class
+from dice_bot import DiceBot
 
 app = Flask(__name__)
 CORS(app)
@@ -20,6 +24,12 @@ STATUS_FILE = DATA_DIR / 'bot_status.json'
 # Ensure directories exist
 LOGS_DIR.mkdir(exist_ok=True)
 DATA_DIR.mkdir(exist_ok=True)
+
+# Bot control variables
+bot_instance = None
+bot_thread = None
+bot_running = False
+bot_should_stop = False
 
 # Initialize status file if it doesn't exist
 if not STATUS_FILE.exists():
@@ -46,6 +56,20 @@ def read_status():
         return {}
     except Exception as e:
         return {'error': str(e)}
+
+
+def update_status(updates):
+    """Update bot status file"""
+    try:
+        status = read_status()
+        status.update(updates)
+        status['last_updated'] = datetime.now().isoformat()
+        with open(STATUS_FILE, 'w') as f:
+            json.dump(status, f, indent=2)
+        return True
+    except Exception as e:
+        print(f"Error updating status: {e}")
+        return False
 
 
 def read_tracking_data():
@@ -115,6 +139,41 @@ def calculate_statistics():
     return stats
 
 
+def run_bot_wrapper():
+    """Wrapper function to run the bot in a separate thread"""
+    global bot_instance, bot_running, bot_should_stop
+    
+    try:
+        print("🤖 Starting bot in background thread...")
+        bot_instance = DiceBot()
+        bot_running = True
+        update_status({
+            'status': 'running',
+            'uptime_start': datetime.now().isoformat()
+        })
+        
+        # Run the bot
+        bot_instance.run()
+        
+    except KeyboardInterrupt:
+        print("Bot stopped by user")
+    except Exception as e:
+        print(f"Error in bot execution: {str(e)}")
+        update_status({
+            'status': 'error',
+            'errors': [f"Bot error: {str(e)}"]
+        })
+    finally:
+        bot_running = False
+        bot_should_stop = False
+        if not bot_should_stop:  # Only set to idle if not manually stopped
+            update_status({
+                'status': 'idle',
+                'uptime_start': None
+            })
+        print("🤖 Bot thread finished")
+
+
 @app.route('/')
 def dashboard():
     """Main dashboard page"""
@@ -151,6 +210,9 @@ def api_status():
             uptime = f"{hours}h {minutes}m"
         except:
             pass
+    
+    # Add actual bot running state
+    status['is_running'] = bot_running
     
     return jsonify({
         'status': status,
@@ -207,24 +269,104 @@ def api_applications():
 @app.route('/api/control/<action>', methods=['POST'])
 def api_control(action):
     """API endpoint for bot control (start/stop/pause)"""
-    # This is a placeholder - you'll need to integrate with your actual bot control
-    status = read_status()
+    global bot_thread, bot_running, bot_should_stop, bot_instance
     
-    if action == 'start':
-        status['status'] = 'running'
-        status['uptime_start'] = datetime.now().isoformat()
-    elif action == 'stop':
-        status['status'] = 'idle'
-        status['uptime_start'] = None
-    elif action == 'pause':
-        status['status'] = 'paused'
-    
-    status['last_updated'] = datetime.now().isoformat()
-    
-    with open(STATUS_FILE, 'w') as f:
-        json.dump(status, f, indent=2)
-    
-    return jsonify({'success': True, 'status': status})
+    try:
+        if action == 'start':
+            if bot_running:
+                return jsonify({
+                    'success': False,
+                    'message': 'Bot is already running'
+                })
+            
+            # Start bot in a new thread
+            bot_should_stop = False
+            bot_thread = threading.Thread(target=run_bot_wrapper, daemon=True)
+            bot_thread.start()
+            
+            return jsonify({
+                'success': True,
+                'message': 'Bot started successfully',
+                'status': 'running'
+            })
+            
+        elif action == 'stop':
+            if not bot_running:
+                return jsonify({
+                    'success': False,
+                    'message': 'Bot is not running'
+                })
+            
+            # Signal bot to stop
+            bot_should_stop = True
+            
+            # Try to stop the bot gracefully
+            if bot_instance:
+                try:
+                    # If bot has a stop method, call it
+                    if hasattr(bot_instance, 'stop'):
+                        bot_instance.stop()
+                    
+                    # Close the browser if it exists
+                    if hasattr(bot_instance, 'driver') and bot_instance.driver:
+                        bot_instance.driver.quit()
+                except Exception as e:
+                    print(f"Error stopping bot: {e}")
+            
+            bot_running = False
+            update_status({
+                'status': 'stopped',
+                'uptime_start': None
+            })
+            
+            return jsonify({
+                'success': True,
+                'message': 'Bot stopped successfully',
+                'status': 'stopped'
+            })
+            
+        elif action == 'pause':
+            if not bot_running:
+                return jsonify({
+                    'success': False,
+                    'message': 'Bot is not running'
+                })
+            
+            update_status({'status': 'paused'})
+            
+            return jsonify({
+                'success': True,
+                'message': 'Bot paused',
+                'status': 'paused'
+            })
+            
+        elif action == 'resume':
+            status = read_status()
+            if status.get('status') != 'paused':
+                return jsonify({
+                    'success': False,
+                    'message': 'Bot is not paused'
+                })
+            
+            update_status({'status': 'running'})
+            
+            return jsonify({
+                'success': True,
+                'message': 'Bot resumed',
+                'status': 'running'
+            })
+        
+        else:
+            return jsonify({
+                'success': False,
+                'message': f'Unknown action: {action}'
+            })
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error: {str(e)}'
+        })
 
 
 @app.route('/api/clear_logs', methods=['POST'])
@@ -256,12 +398,23 @@ def api_export_data():
 
 
 if __name__ == '__main__':
-    print("=" * 60)
-    print("SmartApplyPro Dashboard Starting...")
-    print("=" * 60)
-    print(f"Dashboard URL: http://localhost:5000")
-    print(f"Logs Directory: {LOGS_DIR}")
-    print(f"Data Directory: {DATA_DIR}")
-    print("=" * 60)
+    print("=" * 80)
+    print("🤖 SmartApplyPro - Integrated Bot Control Dashboard")
+    print("=" * 80)
+    print(f"📊 Dashboard URL: http://localhost:5000")
+    print(f"📝 Logs Directory: {LOGS_DIR}")
+    print(f"💾 Data Directory: {DATA_DIR}")
+    print("=" * 80)
+    print("\n✨ Features:")
+    print("   • Start/Stop bot directly from web interface")
+    print("   • Real-time status monitoring")
+    print("   • Live log viewing")
+    print("   • Application tracking")
+    print("\n🎮 Controls:")
+    print("   • Click 'Start Bot' to begin job applications")
+    print("   • Click 'Stop Bot' to halt the bot")
+    print("   • Monitor progress in real-time")
+    print("=" * 80)
+    print("\n🚀 Starting server...\n")
     
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=False, host='0.0.0.0', port=5000, threaded=True)
