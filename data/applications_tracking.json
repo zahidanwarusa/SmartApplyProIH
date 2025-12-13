@@ -45,9 +45,9 @@
     "status": "skipped",
     "job_url": "https://www.dice.com/job-detail/4b89b409-6562-4753-9521-b6a53fd6b587",
     "location": "Remote",
-    "applied_date": "2025-12-13T09:07:18.016963",
+    "applied_date": "2025-12-13T12:12:33.773497",
     "notes": "Already applied (discovered on job details page)",
-    "timestamp": "2025-12-13T09:07:18.016963"
+    "timestamp": "2025-12-13T12:12:33.774563"
   },
   "e085b1c2-2993-49f8-b828-dfa9fd6668ee": {
     "company": "",
@@ -188,5 +188,55 @@
     "applied_date": "2025-12-13T12:10:32.273947",
     "notes": "Already applied (discovered on job details page)",
     "timestamp": "2025-12-13T12:10:32.273947"
+  },
+  "bda5882d-0454-4d0b-9884-fbaa635aeb96": {
+    "company": "",
+    "position": "Data Product Manager (Snowflake)",
+    "status": "skipped",
+    "job_url": "https://www.dice.com/job-detail/bda5882d-0454-4d0b-9884-fbaa635aeb96",
+    "location": "Remote",
+    "applied_date": "2025-12-13T12:13:26.111763",
+    "notes": "Already applied (discovered on job details page)",
+    "timestamp": "2025-12-13T12:13:26.112759"
+  },
+  "599ea2d5-89ab-4680-9157-005c9e984d36": {
+    "company": "",
+    "position": "Anaplan Solution Architect",
+    "status": "skipped",
+    "job_url": "https://www.dice.com/job-detail/599ea2d5-89ab-4680-9157-005c9e984d36",
+    "location": "Remote",
+    "applied_date": "2025-12-13T12:14:18.288304",
+    "notes": "Already applied (discovered on job details page)",
+    "timestamp": "2025-12-13T12:14:18.288304"
+  },
+  "f14abd2b-5bf2-4705-ac79-6c4ea5f551f1": {
+    "company": "",
+    "position": "Release Train Engineer",
+    "status": "skipped",
+    "job_url": "https://www.dice.com/job-detail/f14abd2b-5bf2-4705-ac79-6c4ea5f551f1",
+    "location": "Remote or Dallas, Texas",
+    "applied_date": "2025-12-13T12:15:12.983402",
+    "notes": "Already applied (discovered on job details page)",
+    "timestamp": "2025-12-13T12:15:12.984601"
+  },
+  "1aab0b33-dbf3-4bfe-a8ae-c9418403999b": {
+    "company": "",
+    "position": "Junior Solution Architect",
+    "status": "skipped",
+    "job_url": "https://www.dice.com/job-detail/1aab0b33-dbf3-4bfe-a8ae-c9418403999b",
+    "location": "Remote or Springfield, Illinois",
+    "applied_date": "2025-12-13T12:16:07.169452",
+    "notes": "Already applied (discovered on job details page)",
+    "timestamp": "2025-12-13T12:16:07.169452"
+  },
+  "f506abb7-6ccc-4547-8f94-97853730e212": {
+    "company": "",
+    "position": "Delphi Developer",
+    "status": "skipped",
+    "job_url": "https://www.dice.com/job-detail/f506abb7-6ccc-4547-8f94-97853730e212",
+    "location": "Remote",
+    "applied_date": "2025-12-13T12:17:02.879717",
+    "notes": "Already applied (discovered on job details page)",
+    "timestamp": "2025-12-13T12:17:02.879717"
   }
 }
