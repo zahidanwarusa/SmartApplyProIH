@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generation History - SmartApplyPro</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/standalone-resume.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-robot"></i>
+                    <h1>SmartApplyPro</h1>
+                </div>
+                <p class="tagline">Your AI-Powered Career Accelerator</p>
+                
+                <div class="stats-bar">
+                    <div class="stat-item">
+                        <span class="stat-value">{{ stats.total_generated }}</span>
+                        <span class="stat-label">Total Generated</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">{{ stats.total_today }}</span>
+                        <span class="stat-label">Today</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">{{ stats.history|length }}</span>
+                        <span class="stat-label">In History</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nav-container">
+                <nav class="nav">
+                    <a href="/"><i class="fas fa-file-alt"></i> Generator</a>
+                    <a href="/history" class="active"><i class="fas fa-history"></i> History</a>
+                    <a href="/about"><i class="fas fa-info-circle"></i> About</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            
+            <!-- Hero Section -->
+            <section class="hero">
+                <h2>Generation History</h2>
+                <p class="hero-description">Track all your generated resumes and performance metrics.</p>
+            </section>
+
+            <!-- Recent Generations -->
+            <section class="card">
+                <h3><i class="fas fa-clock"></i> Recent Generations</h3>
+                <p class="section-description">View your resume generation history:</p>
+                
+                {% if stats.history %}
+                    <div class="history-list">
+                        {% for item in stats.history|reverse %}
+                        <div class="history-item">
+                            <div class="history-title">{{ item.job_title }}</div>
+                            <div class="history-company">{{ item.company }}</div>
+                            <div class="history-time">
+                                <i class="fas fa-calendar-alt"></i> {{ item.timestamp }}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="button-group" style="justify-content: center; margin-top: 2rem;">
+                        <button onclick="clearHistory()" class="btn btn-secondary">
+                            <i class="fas fa-trash-alt"></i> Clear History
+                        </button>
+                        <a href="/" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Generate New Resume
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="no-history">
+                        <div class="no-history-icon">
+                            <i class="fas fa-inbox"></i>
+                        </div>
+                        <h3>No resumes generated yet</h3>
+                        <p>Start generating resumes to see them appear here!</p>
+                        <a href="/" class="btn btn-primary" style="margin-top: 2rem;">
+                            <i class="fas fa-magic"></i> Generate Your First Resume
+                        </a>
+                    </div>
+                {% endif %}
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 SmartApplyPro. Your AI-Powered Career Accelerator.</p>
+            <p class="footer-links">
+                <a href="/about"><i class="fas fa-question-circle"></i> Help</a> | 
+                <a href="/about"><i class="fas fa-shield-alt"></i> Privacy</a> | 
+                <a href="/about"><i class="fas fa-file-contract"></i> Terms</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        async function clearHistory() {
+            if (!confirm('Are you sure you want to clear all history? This cannot be undone.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/clear-history', {
+                    method: 'POST'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    location.reload();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('Network error: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>

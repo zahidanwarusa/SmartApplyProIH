@@ -1,12 +1,24 @@
 {
   "status": "running",
-  "last_updated": "2025-12-13T09:16:59.310449",
-  "total_applications": 18,
+  "last_updated": "2025-12-13T12:59:05.286180",
+  "total_applications": 23,
   "successful_applications": 0,
-  "failed_applications": 2,
-  "current_job": "Applying to QA ENGINEER at ",
+  "failed_applications": 3,
+  "current_job": "Reviewing job: Performance Test engineer W2 at ",
   "uptime_start": "2025-12-13T09:01:21.989788",
   "errors": [
+    {
+      "message": "No success confirmation for ",
+      "timestamp": "2025-12-13T12:43:22.344007"
+    },
+    {
+      "message": "No success confirmation for ",
+      "timestamp": "2025-12-13T12:38:55.130510"
+    },
+    {
+      "message": "No success confirmation for ",
+      "timestamp": "2025-12-13T12:22:23.936996"
+    },
     {
       "message": "No success confirmation for ",
       "timestamp": "2025-12-13T09:16:01.766630"

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - SmartApplyPro</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/standalone-resume.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-robot"></i>
+                    <h1>SmartApplyPro</h1>
+                </div>
+                <p class="tagline">Your AI-Powered Career Accelerator</p>
+            </div>
+            
+            <div class="nav-container">
+                <nav class="nav">
+                    <a href="/"><i class="fas fa-file-alt"></i> Generator</a>
+                    <a href="/history"><i class="fas fa-history"></i> History</a>
+                    <a href="/about" class="active"><i class="fas fa-info-circle"></i> About</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            
+            <!-- Hero Section -->
+            <section class="hero">
+                <h2>About SmartApplyPro</h2>
+                <p class="hero-description">AI-powered resume generation made simple and effective.</p>
+            </section>
+
+            <!-- What is SmartApplyPro -->
+            <section class="card">
+                <h3><i class="fas fa-lightbulb"></i> What is SmartApplyPro?</h3>
+                <p>
+                    SmartApplyPro is an AI-powered resume generator that helps you create tailored, 
+                    professional resumes in seconds. Simply paste a job description or upload a file, 
+                    and our AI analyzes the requirements to generate a resume perfectly matched to the position.
+                </p>
+                
+                <div class="highlight-box">
+                    <strong><i class="fas fa-star"></i> Why Use SmartApplyPro?</strong>
+                    <p style="margin-top: 10px;">
+                        Stop spending hours customizing your resume for each job application. 
+                        Our AI does the heavy lifting, analyzing job requirements and optimizing 
+                        your resume to highlight the most relevant skills and experience.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Key Features -->
+            <section class="card">
+                <h3><i class="fas fa-sparkles"></i> Key Features</h3>
+                
+                <div class="feature-grid">
+                    <div class="feature-box">
+                        <div class="feature-icon"><i class="fas fa-robot"></i></div>
+                        <div class="feature-title">AI-Powered</div>
+                        <div class="feature-desc">Advanced AI analyzes job requirements and optimizes your resume</div>
+                    </div>
+                    
+                    <div class="feature-box">
+                        <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+                        <div class="feature-title">Lightning Fast</div>
+                        <div class="feature-desc">Generate professional resumes in under 30 seconds</div>
+                    </div>
+                    
+                    <div class="feature-box">
+                        <div class="feature-icon"><i class="fas fa-bullseye"></i></div>
+                        <div class="feature-title">Perfectly Tailored</div>
+                        <div class="feature-desc">Each resume is customized for the specific job posting</div>
+                    </div>
+                    
+                    <div class="feature-box">
+                        <div class="feature-icon"><i class="fas fa-file-alt"></i></div>
+                        <div class="feature-title">Multiple Formats</div>
+                        <div class="feature-desc">Accept TXT, PDF, DOCX, and JSON file uploads</div>
+                    </div>
+                    
+                    <div class="feature-box">
+                        <div class="feature-icon"><i class="fas fa-briefcase"></i></div>
+                        <div class="feature-title">Professional Output</div>
+                        <div class="feature-desc">Download ready-to-use DOCX resumes</div>
+                    </div>
+                    
+                    <div class="feature-box">
+                        <div class="feature-icon"><i class="fas fa-lock"></i></div>
+                        <div class="feature-title">Privacy Focused</div>
+                        <div class="feature-desc">Your data stays on your server</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- How It Works -->
+            <section class="card">
+                <h3><i class="fas fa-cogs"></i> How It Works</h3>
+                
+                <div class="job-details">
+                    <div class="job-detail-item">
+                        <div class="job-detail-label">
+                            <i class="fas fa-upload"></i> Step 1: Input Job Description
+                        </div>
+                        <div class="job-detail-value">
+                            Choose between pasting job description text directly or uploading a file. 
+                            We support multiple formats including TXT, PDF, DOCX, and JSON.
+                        </div>
+                    </div>
+                    
+                    <div class="job-detail-item">
+                        <div class="job-detail-label">
+                            <i class="fas fa-brain"></i> Step 2: AI Analysis
+                        </div>
+                        <div class="job-detail-value">
+                            Our AI-powered system analyzes the job description to extract required skills, 
+                            experience level, key responsibilities, and company culture indicators.
+                        </div>
+                    </div>
+                    
+                    <div class="job-detail-item">
+                        <div class="job-detail-label">
+                            <i class="fas fa-magic"></i> Step 3: Resume Optimization
+                        </div>
+                        <div class="job-detail-value">
+                            The system matches job requirements with your base resume and optimizes skill 
+                            highlighting, experience relevance, keyword optimization, and achievement emphasis.
+                        </div>
+                    </div>
+                    
+                    <div class="job-detail-item">
+                        <div class="job-detail-label">
+                            <i class="fas fa-download"></i> Step 4: Download & Apply
+                        </div>
+                        <div class="job-detail-value">
+                            Receive a professionally formatted DOCX resume ready to submit. The resume is 
+                            ATS-friendly and optimized for both human reviewers and automated systems.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Best Practices -->
+            <section class="card">
+                <h3><i class="fas fa-check-circle"></i> Best Practices</h3>
+                
+                <div class="highlight-box">
+                    <strong><i class="fas fa-thumbs-up"></i> For Best Results:</strong>
+                    <ul class="job-detail-list">
+                        <li>Include the complete job description with all requirements</li>
+                        <li>Specify the correct job title and company name</li>
+                        <li>Ensure your base resume template is up to date</li>
+                        <li>Use PDFs with selectable text (not scanned images)</li>
+                        <li>Review and customize the generated resume before submitting</li>
+                    </ul>
+                </div>
+                
+                <div class="highlight-box" style="margin-top: 1.5rem;">
+                    <strong><i class="fas fa-file-upload"></i> File Upload Tips:</strong>
+                    <ul class="job-detail-list">
+                        <li>TXT files: Best for simple, clean job descriptions</li>
+                        <li>PDF files: Ensure text is selectable, not image-based</li>
+                        <li>DOCX files: Most reliable for formatted content</li>
+                        <li>JSON files: Use for pre-structured job data</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- FAQ -->
+            <section class="card">
+                <h3><i class="fas fa-question-circle"></i> Frequently Asked Questions</h3>
+                
+                <div class="job-details">
+                    <div class="job-detail-item">
+                        <div class="job-detail-label">Is this free to use?</div>
+                        <div class="job-detail-value">
+                            Yes! This is a standalone application that runs on your own server. 
+                            The only cost is your Gemini API usage, which offers generous free tiers.
+                        </div>
+                    </div>
+                    
+                    <div class="job-detail-item">
+                        <div class="job-detail-label">How many resumes can I generate?</div>
+                        <div class="job-detail-value">
+                            Unlimited! Generate as many resumes as you need, subject to your Gemini API quota.
+                        </div>
+                    </div>
+                    
+                    <div class="job-detail-item">
+                        <div class="job-detail-label">Can I customize the resume template?</div>
+                        <div class="job-detail-value">
+                            Yes! Edit the resume_handler.py file to customize the resume format, 
+                            sections, and styling to match your preferences.
+                        </div>
+                    </div>
+                    
+                    <div class="job-detail-item">
+                        <div class="job-detail-label">What file formats are supported?</div>
+                        <div class="job-detail-value">
+                            We support TXT, PDF, DOCX, and JSON files up to 16MB in size.
+                        </div>
+                    </div>
+                    
+                    <div class="job-detail-item">
+                        <div class="job-detail-label">Is my data secure?</div>
+                        <div class="job-detail-value">
+                            Yes! All data is stored locally on your server. We don't send your data 
+                            anywhere except to the Gemini API for AI processing.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Call to Action -->
+            <section class="card" style="text-align: center;">
+                <h3><i class="fas fa-rocket"></i> Ready to Get Started?</h3>
+                <p class="section-description">Create your first tailored resume in seconds!</p>
+                
+                <div class="button-group" style="justify-content: center;">
+                    <a href="/" class="btn btn-primary">
+                        <i class="fas fa-magic"></i> Generate Resume Now
+                    </a>
+                    <a href="/history" class="btn btn-secondary">
+                        <i class="fas fa-history"></i> View History
+                    </a>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 SmartApplyPro. Your AI-Powered Career Accelerator.</p>
+            <p class="footer-links">
+                <a href="/about"><i class="fas fa-question-circle"></i> Help</a> | 
+                <a href="/about"><i class="fas fa-shield-alt"></i> Privacy</a> | 
+                <a href="/about"><i class="fas fa-file-contract"></i> Terms</a>
+            </p>
+        </div>
+    </footer>
+</body>
+</html>
