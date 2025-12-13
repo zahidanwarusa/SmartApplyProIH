@@ -1,0 +1,15 @@
+{
+  "status": "running",
+  "last_updated": "2025-12-13T08:14:17.386607",
+  "total_applications": 8,
+  "successful_applications": 0,
+  "failed_applications": 1,
+  "current_job": "Searching for: QA Automation Engineer",
+  "uptime_start": "2025-12-13T08:13:47.809898",
+  "errors": [
+    {
+      "message": "No success confirmation for ",
+      "timestamp": "2025-12-13T07:46:34.019009"
+    }
+  ]
+}

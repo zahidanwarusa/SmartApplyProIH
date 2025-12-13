@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% block title %}Logs - SmartApplyPro{% endblock %}
+
+{% block content %}
+<div class="logs-header">
+    <h1><i class="fas fa-file-alt"></i> System Logs</h1>
+    <div class="logs-controls">
+        <select id="log-file-selector" class="form-select" onchange="changeLogFile()">
+            {% for log_file in log_files %}
+            <option value="{{ log_file }}">{{ log_file }}</option>
+            {% endfor %}
+            {% if not log_files %}
+            <option value="bot.log">bot.log (default)</option>
+            {% endif %}
+        </select>
+        <select id="lines-selector" class="form-select" onchange="updateLogs()">
+            <option value="50">Last 50 lines</option>
+            <option value="100" selected>Last 100 lines</option>
+            <option value="200">Last 200 lines</option>
+            <option value="500">Last 500 lines</option>
+        </select>
+        <button class="btn btn-primary" onclick="updateLogs()">
+            <i class="fas fa-sync"></i> Refresh
+        </button>
+        <button class="btn btn-warning" onclick="clearCurrentLog()">
+            <i class="fas fa-trash"></i> Clear Log
+        </button>
+        <button class="btn btn-secondary" onclick="downloadLogs()">
+            <i class="fas fa-download"></i> Download
+        </button>
+    </div>
+</div>
+
+<!-- Search and Filter -->
+<div class="panel">
+    <div class="panel-body">
+        <div class="search-container">
+            <input type="text" id="log-search" class="form-input" placeholder="Search in logs..." oninput="filterLogs()">
+            <div class="filter-options">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="filter-error" onchange="filterLogs()"> Errors Only
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="filter-warning" onchange="filterLogs()"> Warnings Only
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="auto-scroll" checked onchange="toggleAutoScroll()"> Auto-scroll
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Logs Viewer -->
+<div class="panel">
+    <div class="panel-header">
+        <h2>
+            <i class="fas fa-terminal"></i> 
+            <span id="current-log-file">bot.log</span>
+        </h2>
+        <span class="log-info">
+            <span id="log-line-count">0</span> lines | 
+            Last updated: <span id="log-last-update">--</span>
+        </span>
+    </div>
+    <div class="panel-body">
+        <div id="log-content" class="log-content">
+            <p class="text-muted">Loading logs...</p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let autoScrollEnabled = true;
+let currentLogFile = 'bot.log';
+let allLogs = [];
+let refreshInterval;
+
+function updateLogs() {
+    const lines = document.getElementById('lines-selector').value;
+    const logFile = document.getElementById('log-file-selector').value;
+    currentLogFile = logFile;
+
+    fetch(`/api/logs?file=${logFile}&lines=${lines}`)
+        .then(response => response.json())
+        .then(data => {
+            allLogs = data.logs || [];
+            document.getElementById('current-log-file').textContent = data.file;
+            document.getElementById('log-line-count').textContent = allLogs.length;
+            document.getElementById('log-last-update').textContent = formatDateTime(new Date().toISOString());
+            
+            displayLogs(allLogs);
+        })
+        .catch(error => {
+            console.error('Error fetching logs:', error);
+            document.getElementById('log-content').innerHTML = 
+                '<p class="text-danger">Error loading logs</p>';
+        });
+}
+
+function displayLogs(logs) {
+    const logContent = document.getElementById('log-content');
+    
+    if (logs.length === 0) {
+        logContent.innerHTML = '<p class="text-muted">No logs available</p>';
+        return;
+    }
+
+    const html = logs.map((log, index) => {
+        const lineClass = getLogLineClass(log);
+        return `<div class="log-line ${lineClass}" data-index="${index}">${escapeHtml(log)}</div>`;
+    }).join('');
+
+    logContent.innerHTML = html;
+
+    if (autoScrollEnabled) {
+        logContent.scrollTop = logContent.scrollHeight;
+    }
+}
+
+function getLogLineClass(logLine) {
+    const line = logLine.toLowerCase();
+    if (line.includes('error') || line.includes('exception') || line.includes('failed')) {
+        return 'log-error';
+    } else if (line.includes('warning') || line.includes('warn')) {
+        return 'log-warning';
+    } else if (line.includes('success') || line.includes('completed')) {
+        return 'log-success';
+    } else if (line.includes('info')) {
+        return 'log-info';
+    }
+    return '';
+}
+
+function filterLogs() {
+    const searchTerm = document.getElementById('log-search').value.toLowerCase();
+    const filterError = document.getElementById('filter-error').checked;
+    const filterWarning = document.getElementById('filter-warning').checked;
+
+    let filteredLogs = allLogs;
+
+    // Apply search filter
+    if (searchTerm) {
+        filteredLogs = filteredLogs.filter(log => 
+            log.toLowerCase().includes(searchTerm)
+        );
+    }
+
+    // Apply error/warning filters
+    if (filterError) {
+        filteredLogs = filteredLogs.filter(log => {
+            const line = log.toLowerCase();
+            return line.includes('error') || line.includes('exception') || line.includes('failed');
+        });
+    }
+
+    if (filterWarning) {
+        filteredLogs = filteredLogs.filter(log => {
+            const line = log.toLowerCase();
+            return line.includes('warning') || line.includes('warn');
+        });
+    }
+
+    displayLogs(filteredLogs);
+}
+
+function changeLogFile() {
+    updateLogs();
+}
+
+function toggleAutoScroll() {
+    autoScrollEnabled = document.getElementById('auto-scroll').checked;
+}
+
+function clearCurrentLog() {
+    if (!confirm(`Are you sure you want to clear ${currentLogFile}?`)) {
+        return;
+    }
+
+    fetch('/api/clear_logs', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ file: currentLogFile })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Log file cleared successfully', 'success');
+            updateLogs();
+        } else {
+            showNotification('Failed to clear log file: ' + data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error clearing logs:', error);
+        showNotification('Error clearing log file', 'error');
+    });
+}
+
+function downloadLogs() {
+    const logContent = allLogs.join('\n');
+    const blob = new Blob([logContent], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${currentLogFile}_${new Date().toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    showNotification('Log file downloaded', 'success');
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    updateLogs();
+    
+    // Auto-refresh every 3 seconds
+    refreshInterval = setInterval(updateLogs, 3000);
+});
+
+// Clear interval when page is hidden
+document.addEventListener('visibilitychange', function() {
+    if (document.hidden) {
+        clearInterval(refreshInterval);
+    } else {
+        refreshInterval = setInterval(updateLogs, 3000);
+    }
+});
+</script>
+{% endblock %}

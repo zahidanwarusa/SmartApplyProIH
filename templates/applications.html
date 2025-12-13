@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+
+{% block title %}Applications - SmartApplyPro{% endblock %}
+
+{% block content %}
+<div class="applications-header">
+    <h1><i class="fas fa-briefcase"></i> Application History</h1>
+    <div class="applications-controls">
+        <button class="btn btn-primary" onclick="refreshApplications()">
+            <i class="fas fa-sync"></i> Refresh
+        </button>
+        <button class="btn btn-secondary" onclick="exportApplications()">
+            <i class="fas fa-file-export"></i> Export Data
+        </button>
+    </div>
+</div>
+
+<!-- Filter Panel -->
+<div class="panel">
+    <div class="panel-body">
+        <div class="filter-container">
+            <input type="text" id="app-search" class="form-input" placeholder="Search by company, position, or job ID..." oninput="filterApplications()">
+            <div class="filter-buttons">
+                <button class="btn btn-sm btn-outline" onclick="setStatusFilter('all')">
+                    All (<span id="count-all">0</span>)
+                </button>
+                <button class="btn btn-sm btn-outline btn-success" onclick="setStatusFilter('success')">
+                    Success (<span id="count-success">0</span>)
+                </button>
+                <button class="btn btn-sm btn-outline btn-danger" onclick="setStatusFilter('failed')">
+                    Failed (<span id="count-failed">0</span>)
+                </button>
+                <button class="btn btn-sm btn-outline btn-warning" onclick="setStatusFilter('pending')">
+                    Pending (<span id="count-pending">0</span>)
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Applications Table -->
+<div class="panel">
+    <div class="panel-header">
+        <h2>Applications List</h2>
+        <span class="app-info">
+            Showing <span id="showing-count">0</span> of <span id="total-count">0</span> applications
+        </span>
+    </div>
+    <div class="panel-body">
+        <div class="table-responsive">
+            <table class="applications-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Company</th>
+                        <th>Position</th>
+                        <th>Status</th>
+                        <th>Job ID</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="applications-tbody">
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">Loading applications...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        <div class="pagination" id="pagination">
+            <!-- Pagination buttons will be inserted here -->
+        </div>
+    </div>
+</div>
+
+<!-- Application Details Modal -->
+<div id="app-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modal-title">Application Details</h2>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body" id="modal-body">
+            <!-- Details will be inserted here -->
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let allApplications = [];
+let filteredApplications = [];
+let currentPage = 1;
+let perPage = 20;
+let currentStatusFilter = 'all';
+
+function refreshApplications() {
+    fetch('/api/applications?per_page=1000')
+        .then(response => response.json())
+        .then(data => {
+            allApplications = data.applications || [];
+            updateCounts();
+            filterApplications();
+        })
+        .catch(error => {
+            console.error('Error fetching applications:', error);
+            document.getElementById('applications-tbody').innerHTML = 
+                '<tr><td colspan="6" class="text-center text-danger">Error loading applications</td></tr>';
+        });
+}
+
+function updateCounts() {
+    const counts = {
+        all: allApplications.length,
+        success: allApplications.filter(app => app.status === 'success').length,
+        failed: allApplications.filter(app => app.status === 'failed').length,
+        pending: allApplications.filter(app => app.status === 'pending').length
+    };
+
+    document.getElementById('count-all').textContent = counts.all;
+    document.getElementById('count-success').textContent = counts.success;
+    document.getElementById('count-failed').textContent = counts.failed;
+    document.getElementById('count-pending').textContent = counts.pending;
+    document.getElementById('total-count').textContent = counts.all;
+}
+
+function filterApplications() {
+    const searchTerm = document.getElementById('app-search').value.toLowerCase();
+    
+    filteredApplications = allApplications.filter(app => {
+        const matchesSearch = !searchTerm || 
+            (app.company && app.company.toLowerCase().includes(searchTerm)) ||
+            (app.position && app.position.toLowerCase().includes(searchTerm)) ||
+            (app.job_id && app.job_id.toLowerCase().includes(searchTerm));
+        
+        const matchesStatus = currentStatusFilter === 'all' || 
+            app.status === currentStatusFilter;
+        
+        return matchesSearch && matchesStatus;
+    });
+
+    currentPage = 1;
+    displayApplications();
+}
+
+function setStatusFilter(status) {
+    currentStatusFilter = status;
+    filterApplications();
+}
+
+function displayApplications() {
+    const tbody = document.getElementById('applications-tbody');
+    
+    if (filteredApplications.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No applications found</td></tr>';
+        document.getElementById('showing-count').textContent = '0';
+        return;
+    }
+
+    const start = (currentPage - 1) * perPage;
+    const end = start + perPage;
+    const pageApps = filteredApplications.slice(start, end);
+
+    tbody.innerHTML = pageApps.map(app => `
+        <tr>
+            <td>${formatDate(app.applied_date || app.timestamp)}</td>
+            <td>${escapeHtml(app.company || 'N/A')}</td>
+            <td>${escapeHtml(app.position || app.job_title || 'N/A')}</td>
+            <td><span class="status-badge status-${app.status || 'unknown'}">${(app.status || 'unknown').toUpperCase()}</span></td>
+            <td class="job-id">${escapeHtml(app.job_id || 'N/A')}</td>
+            <td>
+                <button class="btn btn-sm btn-info" onclick='viewDetails(${JSON.stringify(app).replace(/'/g, "&apos;")})'>
+                    <i class="fas fa-eye"></i> View
+                </button>
+            </td>
+        </tr>
+    `).join('');
+
+    document.getElementById('showing-count').textContent = filteredApplications.length;
+    
+    updatePagination();
+}
+
+function updatePagination() {
+    const totalPages = Math.ceil(filteredApplications.length / perPage);
+    const pagination = document.getElementById('pagination');
+    
+    if (totalPages <= 1) {
+        pagination.innerHTML = '';
+        return;
+    }
+
+    let html = '<button class="btn btn-sm btn-secondary" onclick="changePage(' + (currentPage - 1) + ')" ' + 
+               (currentPage === 1 ? 'disabled' : '') + '>Previous</button>';
+    
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+            html += `<button class="btn btn-sm ${i === currentPage ? 'btn-primary' : 'btn-secondary'}" 
+                     onclick="changePage(${i})">${i}</button>`;
+        } else if (i === currentPage - 3 || i === currentPage + 3) {
+            html += '<span class="pagination-ellipsis">...</span>';
+        }
+    }
+    
+    html += '<button class="btn btn-sm btn-secondary" onclick="changePage(' + (currentPage + 1) + ')" ' +
+            (currentPage === totalPages ? 'disabled' : '') + '>Next</button>';
+    
+    pagination.innerHTML = html;
+}
+
+function changePage(page) {
+    const totalPages = Math.ceil(filteredApplications.length / perPage);
+    if (page < 1 || page > totalPages) return;
+    
+    currentPage = page;
+    displayApplications();
+}
+
+function viewDetails(app) {
+    document.getElementById('modal-title').textContent = 
+        `${app.company || 'Unknown'} - ${app.position || app.job_title || 'Unknown Position'}`;
+    
+    const details = `
+        <div class="detail-grid">
+            <div class="detail-item">
+                <strong>Company:</strong>
+                <span>${escapeHtml(app.company || 'N/A')}</span>
+            </div>
+            <div class="detail-item">
+                <strong>Position:</strong>
+                <span>${escapeHtml(app.position || app.job_title || 'N/A')}</span>
+            </div>
+            <div class="detail-item">
+                <strong>Job ID:</strong>
+                <span>${escapeHtml(app.job_id || 'N/A')}</span>
+            </div>
+            <div class="detail-item">
+                <strong>Status:</strong>
+                <span class="status-badge status-${app.status || 'unknown'}">${(app.status || 'unknown').toUpperCase()}</span>
+            </div>
+            <div class="detail-item">
+                <strong>Applied Date:</strong>
+                <span>${formatDateTime(app.applied_date || app.timestamp)}</span>
+            </div>
+            <div class="detail-item">
+                <strong>Location:</strong>
+                <span>${escapeHtml(app.location || 'N/A')}</span>
+            </div>
+            ${app.job_url ? `
+            <div class="detail-item">
+                <strong>Job URL:</strong>
+                <span><a href="${escapeHtml(app.job_url)}" target="_blank" class="link">View Job Posting</a></span>
+            </div>
+            ` : ''}
+            ${app.error ? `
+            <div class="detail-item full-width">
+                <strong>Error Message:</strong>
+                <span class="text-danger">${escapeHtml(app.error)}</span>
+            </div>
+            ` : ''}
+            ${app.notes ? `
+            <div class="detail-item full-width">
+                <strong>Notes:</strong>
+                <span>${escapeHtml(app.notes)}</span>
+            </div>
+            ` : ''}
+        </div>
+    `;
+    
+    document.getElementById('modal-body').innerHTML = details;
+    document.getElementById('app-modal').style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('app-modal').style.display = 'none';
+}
+
+function exportApplications() {
+    fetch('/api/export_data')
+        .then(response => response.json())
+        .then(data => {
+            const blob = new Blob([JSON.stringify(data.data, null, 2)], { type: 'application/json' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `applications_export_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            showNotification('Data exported successfully', 'success');
+        })
+        .catch(error => {
+            console.error('Error exporting data:', error);
+            showNotification('Error exporting data', 'error');
+        });
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('app-modal');
+    if (event.target === modal) {
+        closeModal();
+    }
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    refreshApplications();
+});
+
+function formatDate(dateStr) {
+    if (!dateStr) return 'N/A';
+    try {
+        const date = new Date(dateStr);
+        return date.toLocaleDateString();
+    } catch {
+        return dateStr;
+    }
+}
+</script>
+{% endblock %}
